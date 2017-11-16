@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Александр Романчук](https://up.htmlacademy.ru/javascript/11/user/261837).
-* Наставник: `Неизвестно`.
+* Наставник: [Роман Чаругин] (https://htmlacademy.ru/profile/id345379).
 
 ---
 
