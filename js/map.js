@@ -8,14 +8,14 @@ var TYPE_HOUSE = ['flat', 'house', 'bungalo'];
 var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
-var housesWindow = document.querySelector('.map');
+var housesMap = document.querySelector('.map__pins');
 
 /* var similarTemplate = document.querySelector('template article.map__card').content.querySelector(housesWindow);
  */
 // Функция показа элементов
 function showBlock(nameSelector) {
-  housesWindow = document.querySelector(nameSelector);
-  housesWindow.classList.remove('.map--faded');
+  housesMap = document.querySelector(nameSelector);
+  housesMap.classList.remove('map--faded');
 }
 
 function getRandom(num1, num2, fixNum) {
@@ -26,6 +26,10 @@ function getRandom(num1, num2, fixNum) {
 function getRandData(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+/* function getNoRepeatData(arr) {
+
+} */
 
 function getFeatures(FEATURES) {
   var m = getRandom(1, FEATURES.length, 0);
@@ -39,29 +43,29 @@ var houses = function (n) {
   var arr = [];
   for (var i = 0; i < n; i++) {
     arr.push ({
-	  'author': {
-	    'noRepeat': true,
-      'avatar': 'img/avatars/user{{' + getRandData(IMG_NUMBERS) + '}}.png' // Адреса изображений не повторяются
+	  author: {
+	    noRepeat: true,
+      avatar: 'img/avatars/user' + getRandData(IMG_NUMBERS) + '.png' // Адреса изображений не должны повторяться. Как это сделать?
       },
 
-    'location': {
-      'x': getRandom(300, 900, 0),
-      'y': getRandom(100, 500, 0)
+    location: {
+      x: getRandom(300, 900, 0),
+      y: getRandom(100, 500, 0)
 	    },
 
-    'offer': {
-	    'noRepeat': true,
-      'title': getRandData(TITLES), // Значения не должны повторяться.
-      'address': '{{location.x}}, {{location.y}}',
-      'price': getRandom(1000, 1000000, 0), //число, случайная цена от 1000 до 1 000 000
-      'type': getRandData(TYPE_HOUSE), // строка с одним из трех фиксированных значений: flat, house или bungalo
-      'rooms': getRandom(1, 5, 0), //число, случайное количество комнат от 1 до 5
-      'guests': (Math.random()).toFixed(0), //число, случайное количество гостей, которое можно разместить
-      'checkin': getRandData(CHECKIN), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
-      'checkout': getRandData(CHECKOUT), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
-      'features': getFeatures(FEATURES),
-      'description': '',
-      'photos': []
+    offer: {
+	    noRepeat: true,
+      title: getRandData(TITLES), // Значения не должны повторяться. Как это сделать?
+      address: '{{location.x, location.y}}',
+      price: getRandom(1000, 1000000, 0), //число, случайная цена от 1000 до 1 000 000
+      type: getRandData(TYPE_HOUSE), // строка с одним из трех фиксированных значений: flat, house или bungalo
+      rooms: getRandom(1, 5, 0), //число, случайное количество комнат от 1 до 5
+      guests: getRandom(1, 25, 0), //число, случайное количество гостей, которое можно разместить
+      checkin: getRandData(CHECKIN), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
+      checkout: getRandData(CHECKOUT), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
+      features: getFeatures(FEATURES),
+      description: '',
+      photos: []
       }
     });
   }
@@ -72,24 +76,22 @@ var house = houses(8);
 
 showBlock('.map');
 
-
-
-/* // Функция создания элемента для вывода на страницу
-function createElement(arrayName) {
-  var newElement = similarTemplate.cloneNode(true);
-  newElement.querySelector('.setup-similar-label').textContent = arrayName.offer.title;
-  newElement.querySelector('.wizard-coat').style.fill = arrayName.coatColor;
-  newElement.querySelector('.wizard-eyes').style.fill = arrayName.eyesColor;
-  return newElement;
+function createMapPin(house) {
+  var fragment = document.createDocumentFragment();
+  var newMapPin = document.createElement('button');
+  newMapPin.className = 'map__pin';
+  newMapPin.style = 'left: ' + (house.location.x) + 'px; top: ' + (house.location.y) + 'px';
+  newMapPin.innerHTML = '<img src="' + house.author.avatar + '" width="40" height="40" draggable="false">';
+  return newMapPin;
 }
 
-// Функция отрисовки элемента
-function renderElements(arrayName, functionName) {
+function renderMapPins(arrayName, functionName) {
+  var mapList = document.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < arrayName.length; i++) {
     fragment.appendChild(functionName(arrayName[i]));
   }
-  similarListElement.appendChild(fragment);
+  mapList.appendChild(fragment);
 }
 
-renderWizardsElements(houses(8), createElement); */
+renderMapPins(house, createMapPin);
