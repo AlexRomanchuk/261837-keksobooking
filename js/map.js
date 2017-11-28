@@ -12,16 +12,6 @@ var housesMap = document.querySelector('.map__pins');
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-// Функция показа элементов
-function showBlock(nameSelector) {
-  housesMap = document.querySelector(nameSelector);
-  housesMap.classList.remove('map--faded');
-}
-
-function getRandom(num1, num2, fixNum) {
-  return (Math.floor(Math.random() * (num2 - num1 + 1)) + num1).toFixed(fixNum);
-}
-
 // Функция случайного порядка в массиве
 function compareRandom() {
   var randSort = Math.random() - 0.5;
@@ -32,6 +22,15 @@ imgNumbers.sort(compareRandom);
 titles.sort(compareRandom);
 allFeatures.sort(compareRandom);
 
+// Функция показа элементов
+function showBlock(nameSelector) {
+  housesMap = document.querySelector(nameSelector);
+  housesMap.classList.remove('map--faded');
+}
+
+function getRandom(num1, num2, fixNum) {
+  return (Math.floor(Math.random() * (num2 - num1 + 1)) + num1).toFixed(fixNum);
+}
 // Функция выбора случайного элемента массива
 function getRandData(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -78,7 +77,7 @@ var houses = function (n) {
             price: getRandom(1000, 1000000, 0), //число, случайная цена от 1000 до 1 000 000
             type: getRandData(TYPE_HOME), // строка с одним из трех фиксированных значений: flat, house или bungalo
             rooms: getRandom(1, 5, 0), //число, случайное количество комнат от 1 до 5
-            guests: getRandom(1, 10, 0), //число, случайное количество гостей, которое можно разместить
+            guests: getRandom(1, 15, 0), //число, случайное количество гостей, которое можно разместить
             checkin: getRandData(CHECKIN), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
             checkout: getRandData(CHECKOUT), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
             features: getFeatures(allFeatures),
@@ -120,13 +119,21 @@ function homeType(homeVal) {
   return str;
 }
 
+function removeChildren(elem) {
+  while (elem.lastChild) {
+    elem.removeChild(elem.lastChild);
+  }
+}
+
+// Функция предварительного удаления элементов, взятых из шаблона и вставка элементов из массива
 function getListFeatures(newElement, arrayFeatures, nameSelector) {
+  var deleteElem = newElement.querySelector(nameSelector);
+  removeChildren(deleteElem);
   for (var i = 0; i < arrayFeatures.length; i++) {
     var newListElem = document.createElement('li');
     newListElem.className = 'feature feature--' + arrayFeatures[i];
     newElement.querySelector(nameSelector).appendChild(newListElem);
   }
-  return newListElem;
 }
 
 function getElementP(elem, innHTML, arr) {
@@ -134,7 +141,7 @@ function getElementP(elem, innHTML, arr) {
   for (var i = 0; i < paragraphs.length; i++) {
     paragraphs[i].innerHTML = innHTML[i];
   }
- }
+}
 
 function createNotice(house) {
   var newNotice = noticeTemplate.cloneNode(true);
@@ -149,10 +156,11 @@ function createNotice(house) {
     'Заезд после ' + house.offer.checkin + ', выезд до ' + house.offer.checkout,
     house.offer.description];
   getElementP(newNotice, innHTMLArr, house);
+  console.log('Array features: ' + house.offer.features.length);
  /*  newNotice.querySelector('p').innerHTML = house.offer.rooms + ' комнат для ' + house.offer.guests + ' гостей';
   newNotice.querySelector('p').innerHTML = 'Заезд после ' + house.offer.checkin + ', выезд до ' + house.offer.checkout;
   newNotice.querySelector('p').innerHTML = house.offer.description; */
-  getListFeatures(newNotice, house.offer.features, '.popup__features');
+  getListFeatures(newNotice, house.offer.features, 'ul.popup__features');
   return newNotice;
 }
 
