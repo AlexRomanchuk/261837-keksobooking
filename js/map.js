@@ -129,25 +129,39 @@ function getListFeatures(newElement, arrayFeatures, nameSelector) {
   return newListElem;
 }
 
+function getElementP(elem, innHTML, arr) {
+  var paragraphs = elem.querySelectorAll('p');
+  for (var i = 0; i < paragraphs.length; i++) {
+    paragraphs[i].innerHTML = innHTML[i];
+  }
+ }
+
 function createNotice(house) {
   var newNotice = noticeTemplate.cloneNode(true);
   newNotice.querySelector('.popup__avatar').src = house.author.avatar;
   newNotice.querySelector('h3').innerHTML = house.offer.title;
-  newNotice.querySelector('p small').innerHTML = 'Координаты: ' + house.offer.address;
+  /* newNotice.querySelector('p small').innerHTML = 'Координаты: ' + house.offer.address; */
+  /* newNotice.querySelector('.popup__price').innerHTML = '<strong>' + house.offer.price + ' &#x20bd;</strong>/ночь'; */
   newNotice.querySelector('h4').innerHTML = homeType(house.offer.type);
-  newNotice.querySelector('.popup__price').innerHTML = '<strong>' + house.offer.price + ' &#x20bd;</strong>/ночь';
-  newNotice.querySelector('p').innerHTML = house.offer.rooms + ' комнат для ' + house.offer.guests + ' гостей';
+  var innHTMLArr = ['Координаты: ' + house.offer.address,
+    '<strong>' + house.offer.price + ' &#x20bd;</strong>/ночь',
+    house.offer.rooms + ' комнат для ' + house.offer.guests + ' гостей',
+    'Заезд после ' + house.offer.checkin + ', выезд до ' + house.offer.checkout,
+    house.offer.description];
+  getElementP(newNotice, innHTMLArr, house);
+ /*  newNotice.querySelector('p').innerHTML = house.offer.rooms + ' комнат для ' + house.offer.guests + ' гостей';
   newNotice.querySelector('p').innerHTML = 'Заезд после ' + house.offer.checkin + ', выезд до ' + house.offer.checkout;
-  newNotice.querySelector('p').innerHTML = house.offer.description;
+  newNotice.querySelector('p').innerHTML = house.offer.description; */
   getListFeatures(newNotice, house.offer.features, '.popup__features');
   return newNotice;
 }
 
 function renderNotice(arrayName, functionName) {
   var mapList = document.querySelector('.map');
+  var nextElement = document.querySelector('.map__filters-container');
   var fragment = document.createDocumentFragment();
     fragment.appendChild(functionName(arrayName[0]));
-  mapList.appendChild(fragment);
+  mapList.insertBefore(fragment, nextElement);
 }
 
 renderNotice(house, createNotice);
