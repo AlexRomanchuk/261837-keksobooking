@@ -1,17 +1,17 @@
 ﻿'use strict';
 
 // Контстанты: массивы данных о недвижимости
-var IMG_NUMBERS = ['01', '02', '03', '04', '05', '06', '07', '08'];
-var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var TYPE_HOUSE = ['flat', 'house', 'bungalo'];
+var imgNumbers = ['01', '02', '03', '04', '05', '06', '07', '08'];
+var titles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+var allFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var TYPE_HOME = ['flat', 'bungalo', 'house'];
 var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
 var housesMap = document.querySelector('.map__pins');
+// Шаблон
+var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-/* var similarTemplate = document.querySelector('template article.map__card').content.querySelector(housesWindow);
- */
 // Функция показа элементов
 function showBlock(nameSelector) {
   housesMap = document.querySelector(nameSelector);
@@ -22,52 +22,70 @@ function getRandom(num1, num2, fixNum) {
   return (Math.floor(Math.random() * (num2 - num1 + 1)) + num1).toFixed(fixNum);
 }
 
+// Функция случайного порядка в массиве
+function compareRandom() {
+  var randSort = Math.random() - 0.5;
+  return randSort;
+}
+
+imgNumbers.sort(compareRandom);
+titles.sort(compareRandom);
+allFeatures.sort(compareRandom);
+
 // Функция выбора случайного элемента массива
 function getRandData(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* function getNoRepeatData(arr) {
+function getFeatures(arrayFeatures) {
+  var m = getRandom(0, arrayFeatures.length, 0);
+  var newArr = [];
+  for (var i = 0; i < m; i++) {
+    newArr.push(arrayFeatures[i]);
+  }
+  return newArr;
+}
 
-} */
+function getCoordX() {
+  var x = getRandom(300, 900, 0);
+  return x;
+}
 
-function getFeatures(FEATURES) {
-  var m = getRandom(1, FEATURES.length, 0);
-  var features = [];
-  for (var i = 0; i < m; i++)
-    features.push(getRandData(FEATURES));
-    return features;
+function getCoordY() {
+  var y = getRandom(100, 500, 0);
+  return y;
 }
 
 var houses = function (n) {
   var arr = [];
   for (var i = 0; i < n; i++) {
-    arr.push ({
-	  author: {
-	    noRepeat: true,
-      avatar: 'img/avatars/user' + getRandData(IMG_NUMBERS) + '.png' // Адреса изображений не должны повторяться. Как это сделать?
-      },
+    arr.push (
+        {
+	        author: {
+            avatar: 'img/avatars/user' + imgNumbers[i] + '.png'
+          },
+      // Адреса изображений не должны повторяться.
+      // Массив значений предварительно перемешан в случайном порядке, а затем функция их берет по порядку.
 
-    location: {
-      x: getRandom(300, 900, 0),
-      y: getRandom(100, 500, 0)
-	    },
+          location: {
+            x: +getCoordX(),
+            y: +getCoordY()
+	        },
 
-    offer: {
-	    noRepeat: true,
-      title: getRandData(TITLES), // Значения не должны повторяться. Как это сделать?
-      address: '{{location.x, location.y}}',
-      price: getRandom(1000, 1000000, 0), //число, случайная цена от 1000 до 1 000 000
-      type: getRandData(TYPE_HOUSE), // строка с одним из трех фиксированных значений: flat, house или bungalo
-      rooms: getRandom(1, 5, 0), //число, случайное количество комнат от 1 до 5
-      guests: getRandom(1, 25, 0), //число, случайное количество гостей, которое можно разместить
-      checkin: getRandData(CHECKIN), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
-      checkout: getRandData(CHECKOUT), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
-      features: getFeatures(FEATURES),
-      description: '',
-      photos: []
-      }
-    });
+          offer: {
+            title: titles[i], // Значения не должны повторяться.
+            address: getCoordX() + ', ' + getCoordY(),
+            price: getRandom(1000, 1000000, 0), //число, случайная цена от 1000 до 1 000 000
+            type: getRandData(TYPE_HOME), // строка с одним из трех фиксированных значений: flat, house или bungalo
+            rooms: getRandom(1, 5, 0), //число, случайное количество комнат от 1 до 5
+            guests: getRandom(1, 10, 0), //число, случайное количество гостей, которое можно разместить
+            checkin: getRandData(CHECKIN), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
+            checkout: getRandData(CHECKOUT), //строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
+            features: getFeatures(allFeatures),
+            description: '',
+            photos: []
+          }
+       });
   }
   return arr;
 };
@@ -77,10 +95,9 @@ var house = houses(8);
 showBlock('.map');
 
 function createMapPin(house) {
-  var fragment = document.createDocumentFragment();
   var newMapPin = document.createElement('button');
   newMapPin.className = 'map__pin';
-  newMapPin.style = 'left: ' + (house.location.x) + 'px; top: ' + (house.location.y) + 'px';
+  newMapPin.style = 'left: ' + (house.location.x + 20) + 'px; top: ' + (house.location.y + 44) + 'px';
   newMapPin.innerHTML = '<img src="' + house.author.avatar + '" width="40" height="40" draggable="false">';
   return newMapPin;
 }
@@ -90,8 +107,47 @@ function renderMapPins(arrayName, functionName) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < arrayName.length; i++) {
     fragment.appendChild(functionName(arrayName[i]));
-  }
+  };
   mapList.appendChild(fragment);
 }
 
 renderMapPins(house, createMapPin);
+
+// Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
+// Если в аргумент попадает какое-то постороннее значание, сообщает об ошибке.
+function homeType(homeVal) {
+  var str = (homeVal === 'flat') ? 'Квартира' : (homeVal === 'bungalo') ? 'Бунгало' : (homeVal === 'house') ? 'Дом' : '{внутренняя ошибка}';
+  return str;
+}
+
+function getListFeatures(newElement, arrayFeatures, nameSelector) {
+  for (var i = 0; i < arrayFeatures.length; i++) {
+    var newListElem = document.createElement('li');
+    newListElem.className = 'feature feature--' + arrayFeatures[i];
+    newElement.querySelector(nameSelector).appendChild(newListElem);
+  }
+  return newListElem;
+}
+
+function createNotice(house) {
+  var newNotice = noticeTemplate.cloneNode(true);
+  newNotice.querySelector('.popup__avatar').src = house.author.avatar;
+  newNotice.querySelector('h3').innerHTML = house.offer.title;
+  newNotice.querySelector('p small').innerHTML = 'Координаты: ' + house.offer.address;
+  newNotice.querySelector('h4').innerHTML = homeType(house.offer.type);
+  newNotice.querySelector('.popup__price').innerHTML = '<strong>' + house.offer.price + ' &#x20bd;</strong>/ночь';
+  newNotice.querySelector('p').innerHTML = house.offer.rooms + ' комнат для ' + house.offer.guests + ' гостей';
+  newNotice.querySelector('p').innerHTML = 'Заезд после ' + house.offer.checkin + ', выезд до ' + house.offer.checkout;
+  newNotice.querySelector('p').innerHTML = house.offer.description;
+  getListFeatures(newNotice, house.offer.features, '.popup__features');
+  return newNotice;
+}
+
+function renderNotice(arrayName, functionName) {
+  var mapList = document.querySelector('.map');
+  var fragment = document.createDocumentFragment();
+    fragment.appendChild(functionName(arrayName[0]));
+  mapList.appendChild(fragment);
+}
+
+renderNotice(house, createNotice);
