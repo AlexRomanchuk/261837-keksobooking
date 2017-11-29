@@ -2,21 +2,11 @@
 
 // Контстанты: массивы данных о недвижимости
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-var ALL_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var TYPE_HOME = ['flat', 'bungalo', 'house'];
 var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
-// Генерация массива из чисел (строк) с ведущим нулем любой длины n
-function generateArrayNumbers(n) {
-  var arr = [];
-  for (var i = 1; i <= n; i++) {
-    arr.push(i);
-  }
-  return arr;
-}
-
-var imgNumbers = generateArrayNumbers(8);
 var housesMap = document.querySelector('.map__pins');
 
 // Шаблон
@@ -39,7 +29,7 @@ function getRandomElement(arr) {
 }
 
 // Функция случайной сборки массива из элементов копии основного массива
-function getRandomCollection(arr, n) {
+function shuffleArray(arr, n) {
   var collection = arr.slice(0);
   var newArr = [];
   for (var i = 0; i < n; i++) {
@@ -52,44 +42,26 @@ function getRandomCollection(arr, n) {
 }
 
 // Элементы не должны повторяться в окне объявления.
-function renderFeatures(arrayFeatures) {
-  var newList = getRandomCollection(arrayFeatures, getRandomNumber(0, arrayFeatures.length));
-  return newList;
-}
-
-function renderTitles(arrayTitles) {
-  var newList = getRandomCollection(arrayTitles, 8);
-  return newList;
-}
-
-function renderImgNumbers(arrayNumbers) {
-  var newList = getRandomCollection(arrayNumbers, 8);
-  return newList;
-}
-
-var listImages = renderImgNumbers(imgNumbers);
-var listTitles = renderTitles(TITLES);
+var listTitles = shuffleArray(TITLES, TITLES.length);
 
 var renderListHouses = function (n) {
   var arr = [];
-  for (var i = 0; i < n; i++) {
+  for (var i = 1; i <= n; i++) {
     var coordX = getRandomNumber(300, 900);
     var coordY = getRandomNumber(100, 500);
     arr.push(
         {
           author: {
-            avatar: 'img/avatars/user0' + listImages[i] + '.png'
+            avatar: 'img/avatars/user0' + i + '.png'
           },
-          // Адреса изображений не должны повторяться.
-          // Массив значений предварительно перемешан в случайном порядке, а затем функция их берет по порядку.
 
           location: {
-            x: +coordX,
-            y: +coordY
+            x: coordX,
+            y: coordY
           },
 
           offer: {
-            title: listTitles[i], // Значения не должны повторяться.
+            title: listTitles[i - 1], // Значения не должны повторяться.
             address: coordX + ', ' + coordY,
             price: getRandomNumber(1000, 1000000), // число, случайная цена от 1000 до 1 000 000
             type: getRandomElement(TYPE_HOME), // строка с одним из трех фиксированных значений: flat, house или bungalo
@@ -97,7 +69,7 @@ var renderListHouses = function (n) {
             guests: getRandomNumber(1, 15), // число, случайное количество гостей, которое можно разместить
             checkin: getRandomElement(CHECKIN), // строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
             checkout: getRandomElement(CHECKOUT), // строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
-            features: renderFeatures(ALL_FEATURES),
+            features: shuffleArray(FEATURES, getRandomNumber(0, FEATURES.length)),
             description: '',
             photos: []
           }
@@ -107,13 +79,15 @@ var renderListHouses = function (n) {
 };
 
 var listHouses = renderListHouses(8);
+var shuffledListHouses = shuffleArray(listHouses, listHouses.length);
 
 showBlock('.map');
 
 function createMapPin(arr) {
   var newMapPin = document.createElement('button');
   newMapPin.className = 'map__pin';
-  newMapPin.style = 'left: ' + (arr.location.x + 20) + 'px; top: ' + (arr.location.y + 44) + 'px';
+  newMapPin.style.left = (arr.location.x + 20) + 'px';
+  newMapPin.style.top = (arr.location.y + 44) + 'px';
   newMapPin.innerHTML = '<img src="' + arr.author.avatar + '" width="40" height="40" draggable="false">';
   return newMapPin;
 }
@@ -127,10 +101,10 @@ function renderMapPins(arrayName, creatingFunctionName) {
   mapList.appendChild(fragment);
 }
 
-renderMapPins(listHouses, createMapPin);
+renderMapPins(shuffledListHouses, createMapPin);
 
 // Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
-function checkHomeType(homeVal) {
+function getHomeType(homeVal) {
   var str = '';
   switch (homeVal) {
     case 'flat':
@@ -139,14 +113,14 @@ function checkHomeType(homeVal) {
     case 'bungalo':
       str = 'Бунгало';
       break;
-    case 'house':
+    default:
       str = 'Дом';
       break;
   }
   return str;
 }
 
-// фуекция удаления всех элементов
+// Функция удаления всех элементов
 function removeChildren(elem) {
   while (elem.lastChild) {
     elem.removeChild(elem.lastChild);
@@ -174,10 +148,10 @@ function getElementP(elem, innHTML) {
 function createNotice(arr) {
   var newNotice = noticeTemplate.cloneNode(true);
   newNotice.querySelector('.popup__avatar').src = arr.author.avatar;
-  newNotice.querySelector('h3').innerHTML = arr.offer.title;
-  newNotice.querySelector('h4').innerHTML = checkHomeType(arr.offer.type);
-  var innHTMLArr = ['Координаты: ' + arr.offer.address,
-    '<strong>' + arr.offer.price + ' &#x20bd;</strong>/ночь',
+  newNotice.querySelector('h3').textContent = arr.offer.title;
+  newNotice.querySelector('h4').textContent = getHomeType(arr.offer.type);
+  var innHTMLArr = ['<small>Координаты: ' + arr.offer.address + '</small>',
+    arr.offer.price + ' &#x20bd;/ночь',
     arr.offer.rooms + ' комнат для ' + arr.offer.guests + ' гостей',
     'Заезд после ' + arr.offer.checkin + ', выезд до ' + arr.offer.checkout,
     arr.offer.description];
@@ -198,4 +172,4 @@ function renderNotice(arrayName, creatingFunctionName) {
   renderElement(arrayName, creatingFunctionName, mapList, nextElement);
 }
 
-renderNotice(listHouses, createNotice);
+renderNotice(shuffledListHouses, createNotice);
