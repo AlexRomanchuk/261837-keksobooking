@@ -11,27 +11,16 @@ var CHECKOUT = ['12:00', '13:00', '14:00'];
 function generateArrayNumbers(n) {
   var arr = [];
   for (var i = 1; i <= n; i++) {
-    arr.push('0' + i);
+    arr.push(i);
   }
   return arr;
 }
 
 var imgNumbers = generateArrayNumbers(8);
-
 var housesMap = document.querySelector('.map__pins');
+
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
-
-// Функция случайного порядка в массиве
-function compareRandom() {
-  var randSort = Math.random() - 0.5;
-  return randSort;
-}
-
-// Перемешивание массивов
-imgNumbers.sort(compareRandom);
-TITLES.sort(compareRandom);
-ALL_FEATURES.sort(compareRandom);
 
 // Функция показа элементов
 function showBlock(nameSelector) {
@@ -39,34 +28,57 @@ function showBlock(nameSelector) {
   housesMap.classList.remove('map--faded');
 }
 
-function getRandom(num1, num2) {
-  return (Math.floor(Math.random() * (num2 - num1 + 1)) + num1).toFixed(0);
-}
-// Функция выбора случайного элемента массива
-function getRandomElement(arr) {
-  return arr[getRandom(0, arr.length - 1)];
+// Генерация случайного целого числа
+function getRandomNumber(num1, num2) {
+  return (Math.floor(Math.random() * (num2 - num1 + 1)) + num1);
 }
 
-// Функция отбора части массива случайной длины. Вызывается после перемешивания.
-// Значки features не должны повторяться в окне объявления.
-function getFeatures(arrayFeatures) {
-  var m = getRandom(0, arrayFeatures.length);
+// Функция выбора случайного элемента массива
+function getRandomElement(arr) {
+  return arr[getRandomNumber(0, arr.length - 1)];
+}
+
+// Функция случайной сборки массива из элементов копии основного массива
+function getRandomCollection(arr, n) {
+  var collection = arr.slice(0);
   var newArr = [];
-  for (var i = 0; i < m; i++) {
-    newArr.push(arrayFeatures[i]);
+  for (var i = 0; i < n; i++) {
+    var rand = getRandomNumber(0, collection.length - 1);
+    var randomElement = collection[rand];
+    newArr.push(randomElement);
+    collection.splice(rand, 1);
   }
   return newArr;
 }
 
+// Элементы не должны повторяться в окне объявления.
+function renderFeatures(arrayFeatures) {
+  var newList = getRandomCollection(arrayFeatures, getRandomNumber(0, arrayFeatures.length));
+  return newList;
+}
+
+function renderTitles(arrayTitles) {
+  var newList = getRandomCollection(arrayTitles, 8);
+  return newList;
+}
+
+function renderImgNumbers(arrayNumbers) {
+  var newList = getRandomCollection(arrayNumbers, 8);
+  return newList;
+}
+
+var listImages = renderImgNumbers(imgNumbers);
+var listTitles = renderTitles(TITLES);
+
 var renderListHouses = function (n) {
   var arr = [];
   for (var i = 0; i < n; i++) {
-    var coordX = getRandom(300, 900);
-    var coordY = getRandom(100, 500);
+    var coordX = getRandomNumber(300, 900);
+    var coordY = getRandomNumber(100, 500);
     arr.push(
         {
           author: {
-            avatar: 'img/avatars/user' + imgNumbers[i] + '.png'
+            avatar: 'img/avatars/user0' + listImages[i] + '.png'
           },
           // Адреса изображений не должны повторяться.
           // Массив значений предварительно перемешан в случайном порядке, а затем функция их берет по порядку.
@@ -77,15 +89,15 @@ var renderListHouses = function (n) {
           },
 
           offer: {
-            title: TITLES[i], // Значения не должны повторяться.
+            title: listTitles[i], // Значения не должны повторяться.
             address: coordX + ', ' + coordY,
-            price: getRandom(1000, 1000000), // число, случайная цена от 1000 до 1 000 000
+            price: getRandomNumber(1000, 1000000), // число, случайная цена от 1000 до 1 000 000
             type: getRandomElement(TYPE_HOME), // строка с одним из трех фиксированных значений: flat, house или bungalo
-            rooms: getRandom(1, 5), // число, случайное количество комнат от 1 до 5
-            guests: getRandom(1, 15), // число, случайное количество гостей, которое можно разместить
+            rooms: getRandomNumber(1, 5), // число, случайное количество комнат от 1 до 5
+            guests: getRandomNumber(1, 15), // число, случайное количество гостей, которое можно разместить
             checkin: getRandomElement(CHECKIN), // строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
             checkout: getRandomElement(CHECKOUT), // строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
-            features: getFeatures(ALL_FEATURES),
+            features: renderFeatures(ALL_FEATURES),
             description: '',
             photos: []
           }
