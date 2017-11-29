@@ -10,9 +10,9 @@ var CHECKOUT = ['12:00', '13:00', '14:00'];
 // Генерация массива из чисел (строк) с ведущим нулем любой длины n
 function generateArrayNumbers(n) {
   var arr = [];
-    for (var i = 1; i <= n; i++) {
-      arr.push('0' + i);
-    }
+  for (var i = 1; i <= n; i++) {
+    arr.push('0' + i);
+  }
   return arr;
 }
 
@@ -28,7 +28,7 @@ function compareRandom() {
   return randSort;
 }
 
-// Перемешивание всех массивов
+// Перемешивание массивов
 imgNumbers.sort(compareRandom);
 TITLES.sort(compareRandom);
 ALL_FEATURES.sort(compareRandom);
@@ -47,6 +47,8 @@ function getRandomElement(arr) {
   return arr[getRandom(0, arr.length - 1)];
 }
 
+// Функция отбора части массива случайной длины. Вызывается после перемешивания.
+// Значки features не должны повторяться в окне объявления.
 function getFeatures(arrayFeatures) {
   var m = getRandom(0, arrayFeatures.length);
   var newArr = [];
@@ -92,7 +94,7 @@ var renderListHouses = function (n) {
   return arr;
 };
 
-var ListHouses = renderListHouses(8);
+var listHouses = renderListHouses(8);
 
 showBlock('.map');
 
@@ -113,12 +115,12 @@ function renderMapPins(arrayName, creatingFunctionName) {
   mapList.appendChild(fragment);
 }
 
-renderMapPins(ListHouses, createMapPin);
+renderMapPins(listHouses, createMapPin);
 
 // Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
-function homeType(homeVal) {
+function checkHomeType(homeVal) {
   var str = '';
-  switch(homeVal) {
+  switch (homeVal) {
     case 'flat':
       str = 'Квартира';
       break;
@@ -161,7 +163,7 @@ function createNotice(arr) {
   var newNotice = noticeTemplate.cloneNode(true);
   newNotice.querySelector('.popup__avatar').src = arr.author.avatar;
   newNotice.querySelector('h3').innerHTML = arr.offer.title;
-  newNotice.querySelector('h4').innerHTML = homeType(arr.offer.type);
+  newNotice.querySelector('h4').innerHTML = checkHomeType(arr.offer.type);
   var innHTMLArr = ['Координаты: ' + arr.offer.address,
     '<strong>' + arr.offer.price + ' &#x20bd;</strong>/ночь',
     arr.offer.rooms + ' комнат для ' + arr.offer.guests + ' гостей',
@@ -172,12 +174,16 @@ function createNotice(arr) {
   return newNotice;
 }
 
-function renderNotice(arrayName, creatingFunctionName) {
-  var mapList = document.querySelector('.map');
-  var nextElement = document.querySelector('.map__filters-container');
+function renderElement(arrayName, creatingFunctionName, mapList, nextElement) {
   var fragment = document.createDocumentFragment();
   fragment.appendChild(creatingFunctionName(arrayName[0]));
   mapList.insertBefore(fragment, nextElement);
 }
 
-renderNotice(ListHouses, createNotice);
+function renderNotice(arrayName, creatingFunctionName) {
+  var mapList = document.querySelector('.map');
+  var nextElement = document.querySelector('.map__filters-container');
+  renderElement(arrayName, creatingFunctionName, mapList, nextElement);
+}
+
+renderNotice(listHouses, createNotice);
