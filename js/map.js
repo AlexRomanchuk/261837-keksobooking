@@ -1,5 +1,8 @@
 ﻿'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // Контстанты: массивы данных о недвижимости
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
@@ -8,9 +11,53 @@ var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
 var housesMap = document.querySelector('.map__pins');
+var popup = document.querySelector('.map__pin');
+var mapOpen = document.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+
+// "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
+function lockOrOpenFields(elemFields, disabledProperty) {
+  var fields = elemFields.getElementsByTagName('fieldset');
+  for (var i = 0; i < fields.length; i++) {
+    fields[i].disabled = disabledProperty;
+  }
+}
+
+lockOrOpenFields(noticeForm, 'disabled');
 
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
+
+var openElements = function () {
+  showBlock('.map');
+  lockOrOpenFields(noticeForm, '')
+  renderMapPins(listHouses, createMapPin);
+  noticeForm.classList.remove('notice__form--disabled');
+}
+
+var openPopup = function () {
+  popup.classList.add('map__pin--active');
+}
+
+mapOpen.addEventListener('mouseup', function () {
+  openElements();
+});
+
+mapOpen.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openElements();
+  }
+});
+
+popup.addEventListener('click', function () {
+  openPopup();
+});
+
+popup.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openPopup();
+  }
+});
 
 // Функция показа элементов
 function showBlock(nameSelector) {
@@ -80,8 +127,6 @@ var renderListHouses = function (n) {
 
 var listHouses = renderListHouses(8);
 
-showBlock('.map');
-
 function createMapPin(arr) {
   var newMapPin = document.createElement('button');
   newMapPin.className = 'map__pin';
@@ -105,9 +150,8 @@ function renderMapPins(arrayAvatars, creatingFunctionName) {
   mapList.appendChild(fragment);
 }
 
-renderMapPins(listHouses, createMapPin);
 
-// Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
+  // Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
 function getHomeType(homeVal) {
   var str = '';
   switch (homeVal) {
