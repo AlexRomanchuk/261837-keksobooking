@@ -79,7 +79,6 @@ var renderListHouses = function (n) {
 };
 
 var listHouses = renderListHouses(8);
-var shuffledListHouses = shuffleArray(listHouses, listHouses.length);
 
 showBlock('.map');
 
@@ -88,20 +87,25 @@ function createMapPin(arr) {
   newMapPin.className = 'map__pin';
   newMapPin.style.left = (arr.location.x + 20) + 'px';
   newMapPin.style.top = (arr.location.y + 44) + 'px';
-  newMapPin.innerHTML = '<img src="' + arr.author.avatar + '" width="40" height="40" draggable="false">';
+  var newAvatar = document.createElement('img');
+  newAvatar.width = 40;
+  newAvatar.heigth = 40;
+  newAvatar.src = arr.author.avatar;
+  newAvatar.draggable = false;
+  newMapPin.appendChild(newAvatar);
   return newMapPin;
 }
 
-function renderMapPins(arrayName, creatingFunctionName) {
+function renderMapPins(arrayAvatars, creatingFunctionName) {
   var mapList = document.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < arrayName.length; i++) {
-    fragment.appendChild(creatingFunctionName(arrayName[i]));
+  for (var i = 0; i < arrayAvatars.length; i++) {
+    fragment.appendChild(creatingFunctionName(arrayAvatars[i]));
   }
   mapList.appendChild(fragment);
 }
 
-renderMapPins(shuffledListHouses, createMapPin);
+renderMapPins(listHouses, createMapPin);
 
 // Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
 function getHomeType(homeVal) {
@@ -139,22 +143,22 @@ function getListFeatures(newElement, arrayFeatures, nameSelector) {
 }
 
 function getElementP(elem, innHTML) {
-  var paragraphs = elem.querySelectorAll('p');
-  for (var i = 0; i < paragraphs.length; i++) {
-    paragraphs[i].innerHTML = innHTML[i];
+  var paragraphs = elem.getElementsByTagName('p');
+  for (var i = 1; i < paragraphs.length; i++) {
+    paragraphs[i].textContent = innHTML[i];
   }
 }
 
 function createNotice(arr) {
+  var innHTMLArr = ['Координаты: ' + arr.offer.address, arr.offer.price + ' \u20bd/ночь',
+    arr.offer.rooms + ' комнат для ' + arr.offer.guests + ' гостей',
+    'Заезд после ' + arr.offer.checkin + ', выезд до ' + arr.offer.checkout,
+    arr.offer.description];
   var newNotice = noticeTemplate.cloneNode(true);
   newNotice.querySelector('.popup__avatar').src = arr.author.avatar;
   newNotice.querySelector('h3').textContent = arr.offer.title;
   newNotice.querySelector('h4').textContent = getHomeType(arr.offer.type);
-  var innHTMLArr = ['<small>Координаты: ' + arr.offer.address + '</small>',
-    arr.offer.price + ' &#x20bd;/ночь',
-    arr.offer.rooms + ' комнат для ' + arr.offer.guests + ' гостей',
-    'Заезд после ' + arr.offer.checkin + ', выезд до ' + arr.offer.checkout,
-    arr.offer.description];
+  newNotice.querySelector('small').textContent = innHTMLArr[0];
   getElementP(newNotice, innHTMLArr);
   getListFeatures(newNotice, arr.offer.features, 'ul.popup__features');
   return newNotice;
@@ -172,4 +176,4 @@ function renderNotice(arrayName, creatingFunctionName) {
   renderElement(arrayName, creatingFunctionName, mapList, nextElement);
 }
 
-renderNotice(shuffledListHouses, createNotice);
+renderNotice(listHouses, createNotice);
