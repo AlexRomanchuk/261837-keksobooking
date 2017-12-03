@@ -39,27 +39,28 @@ var openElements = function () {
   // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
   var previousCard = -1;
 
-	for (var i = 0; i < listHouses.length; i++) {
+  for (var i = 0; i < listHouses.length; i++) {
     (function (j) {
       var cards = map.querySelectorAll('.map__card');
       var buttonsPopup = housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
       var buttonClosePopup = cards[j].querySelector('.popup__close');
 
-      function openPopup (j) {
-        var currentCard = j;
-        buttonsPopup[j].classList.add('map__pin--active');
-        cards[j].classList.remove('hidden');
+      function openPopup(index) {
+        var currentCard = index;
+        buttonsPopup[index].classList.add('map__pin--active');
+        cards[index].classList.remove('hidden');
         if (previousCard !== -1 && previousCard !== currentCard) {
           closePopup(previousCard);
         }
         previousCard = currentCard;
-        return previousCard;
+        document.addEventListener('keydown', onPopupEscPress);
       }
 
-      function closePopup (j) {
-        cards[j].classList.add('hidden');
-        buttonsPopup[j].classList.remove('map__pin--active');
+      function closePopup(index) {
+        cards[index].classList.add('hidden');
+        buttonsPopup[index].classList.remove('map__pin--active');
         previousCard = -1;
+        document.addEventListener('keydown', onPopupEscPress);
       }
 
       buttonsPopup[j].addEventListener('click', function () {
@@ -81,9 +82,15 @@ var openElements = function () {
           closePopup(j);
         }
       });
+
+      var onPopupEscPress = function (evt) {
+        if (evt.keyCode === ESC_KEYCODE) {
+          closePopup(j);
+        }
+      };
     })(i);
   }
-}
+};
 
 mapOpen.addEventListener('mouseup', function () {
   openElements();
