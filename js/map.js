@@ -11,9 +11,9 @@ var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
 var housesMap = document.querySelector('.map__pins');
-var popup = document.querySelector('.map__pin');
-var mapOpen = document.querySelector('.map__pin--main');
+var mapOpen = housesMap.querySelector('.map__pin--main');
 var noticeForm = document.querySelector('.notice__form');
+var map = document.querySelector('.map');
 
 // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
 function lockOrOpenFields(elemFields, disabledProperty) {
@@ -30,13 +30,59 @@ var noticeTemplate = document.querySelector('template').content.querySelector('a
 
 var openElements = function () {
   showBlock('.map');
-  lockOrOpenFields(noticeForm, '')
-  renderMapPins(listHouses, createMapPin);
   noticeForm.classList.remove('notice__form--disabled');
-}
+  lockOrOpenFields(noticeForm, '');
+  renderMapPins(listHouses, createMapPin);
+  renderNotice(listHouses, createNotice);
+  mapOpen.disabled = 'disabled';
 
-var openPopup = function () {
-  popup.classList.add('map__pin--active');
+  // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
+  var previousCard = -1;
+
+	for (var i = 0; i < listHouses.length; i++) {
+    (function (j) {
+      var cards = map.querySelectorAll('.map__card');
+      var buttonsPopup = housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+      var buttonClosePopup = cards[j].querySelector('.popup__close');
+
+      function openPopup (j) {
+        var currentCard = j;
+        buttonsPopup[j].classList.add('map__pin--active');
+        cards[j].classList.remove('hidden');
+        if (previousCard !== -1 && previousCard !== currentCard) {
+          closePopup(previousCard);
+        }
+        previousCard = currentCard;
+        return previousCard;
+      }
+
+      function closePopup (j) {
+        cards[j].classList.add('hidden');
+        buttonsPopup[j].classList.remove('map__pin--active');
+        previousCard = -1;
+      }
+
+      buttonsPopup[j].addEventListener('click', function () {
+        openPopup(j);
+      });
+
+      buttonsPopup[j].addEventListener('keydown', function (evt) {
+        if (evt.keyCode === ENTER_KEYCODE) {
+          openPopup(j);
+        }
+      });
+
+      buttonClosePopup.addEventListener('click', function () {
+        closePopup(j);
+      });
+
+      buttonClosePopup.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === ENTER_KEYCODE) {
+          closePopup(j);
+        }
+      });
+    })(i);
+  }
 }
 
 mapOpen.addEventListener('mouseup', function () {
@@ -46,16 +92,6 @@ mapOpen.addEventListener('mouseup', function () {
 mapOpen.addEventListener('keydown', function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
     openElements();
-  }
-});
-
-popup.addEventListener('click', function () {
-  openPopup();
-});
-
-popup.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    openPopup();
   }
 });
 
@@ -145,13 +181,12 @@ function renderMapPins(arrayAvatars, creatingFunctionName) {
   var mapList = document.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < arrayAvatars.length; i++) {
-    fragment.appendChild(creatingFunctionName(arrayAvatars[i]));
+    fragment.appendChild(creatingFunctionName(arrayAvatars[i], i));
   }
   mapList.appendChild(fragment);
 }
 
-
-  // Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
+// Функция вывода строки типа жилья в зависимости от типа, указанного в массиве
 function getHomeType(homeVal) {
   var str = '';
   switch (homeVal) {
@@ -205,13 +240,16 @@ function createNotice(arr) {
   newNotice.querySelector('small').textContent = innHTMLArr[0];
   getElementP(newNotice, innHTMLArr);
   getListFeatures(newNotice, arr.offer.features, 'ul.popup__features');
+  newNotice.classList.add('hidden');
   return newNotice;
 }
 
 function renderElement(arrayName, creatingFunctionName, mapList, nextElement) {
   var fragment = document.createDocumentFragment();
-  fragment.appendChild(creatingFunctionName(arrayName[0]));
-  mapList.insertBefore(fragment, nextElement);
+  for (var i = 0; i < arrayName.length; i++) {
+    fragment.appendChild(creatingFunctionName(arrayName[i], i));
+    mapList.insertBefore(fragment, nextElement);
+  }
 }
 
 function renderNotice(arrayName, creatingFunctionName) {
@@ -219,5 +257,3 @@ function renderNotice(arrayName, creatingFunctionName) {
   var nextElement = document.querySelector('.map__filters-container');
   renderElement(arrayName, creatingFunctionName, mapList, nextElement);
 }
-
-renderNotice(listHouses, createNotice);
