@@ -1,5 +1,8 @@
 ﻿'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // Контстанты: массивы данных о недвижимости
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
@@ -8,9 +11,97 @@ var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 
 var housesMap = document.querySelector('.map__pins');
+var mapOpen = housesMap.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var map = document.querySelector('.map');
+var fields = noticeForm.getElementsByTagName('fieldset');
+
+// "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
+function toggleFields(disabledProperty) {
+  for (var i = 0; i < fields.length; i++) {
+    fields[i].disabled = disabledProperty;
+  }
+}
+
+toggleFields('disabled');
 
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
+
+var openElements = function () {
+  showBlock('.map');
+  noticeForm.classList.remove('notice__form--disabled');
+  toggleFields('');
+  renderMapPins(listHouses, createMapPin);
+  renderNotice(listHouses, createNotice);
+  mapOpen.disabled = 'disabled';
+
+  // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
+  var previousCard = -1;
+
+  var cards = map.querySelectorAll('.map__card');
+  var buttonsPopup = housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+
+  function openPopup(index) {
+    var currentCard = index;
+    buttonsPopup[index].classList.add('map__pin--active');
+    cards[index].classList.remove('hidden');
+    if (previousCard !== -1 && previousCard !== currentCard) {
+      closePopup(previousCard);
+    }
+    previousCard = currentCard;
+  }
+
+  function closePopup(index) {
+    cards[index].classList.add('hidden');
+    buttonsPopup[index].classList.remove('map__pin--active');
+    previousCard = -1;
+  }
+
+  for (var i = 0; i < listHouses.length; i++) {
+    (function (j) {
+      var buttonClosePopup = cards[j].querySelector('.popup__close');
+
+      buttonsPopup[j].addEventListener('click', function () {
+        openPopup(j);
+      });
+
+      buttonsPopup[j].addEventListener('keydown', function (evt) {
+        if (evt.keyCode === ENTER_KEYCODE) {
+          openPopup(j);
+        }
+      });
+
+      buttonClosePopup.addEventListener('click', function () {
+        closePopup(j);
+      });
+
+      buttonClosePopup.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === ENTER_KEYCODE) {
+          closePopup(j);
+        }
+      });
+
+      function onPopupEscPress(evt) {
+        if (evt.keyCode === ESC_KEYCODE) {
+          closePopup(j);
+        }
+      }
+
+      document.addEventListener('keydown', onPopupEscPress);
+    })(i);
+  }
+};
+
+mapOpen.addEventListener('mouseup', function () {
+  openElements();
+});
+
+mapOpen.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openElements();
+  }
+});
 
 // Функция показа элементов
 function showBlock(nameSelector) {
@@ -44,7 +135,7 @@ function shuffleArray(arr, n) {
 // Элементы не должны повторяться в окне объявления.
 var listTitles = shuffleArray(TITLES, TITLES.length);
 
-var renderListHouses = function (n) {
+function renderListHouses(n) {
   var arr = [];
   for (var i = 1; i <= n; i++) {
     var coordX = getRandomNumber(300, 900);
@@ -76,11 +167,9 @@ var renderListHouses = function (n) {
         });
   }
   return arr;
-};
+}
 
 var listHouses = renderListHouses(8);
-
-showBlock('.map');
 
 function createMapPin(arr) {
   var newMapPin = document.createElement('button');
@@ -100,14 +189,12 @@ function renderMapPins(arrayAvatars, creatingFunctionName) {
   var mapList = document.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < arrayAvatars.length; i++) {
-    fragment.appendChild(creatingFunctionName(arrayAvatars[i]));
+    fragment.appendChild(creatingFunctionName(arrayAvatars[i], i));
   }
   mapList.appendChild(fragment);
 }
 
-renderMapPins(listHouses, createMapPin);
-
-// Функция вывода строки типа жилья в зависимости от типа, указанного в массиве.
+// Функция вывода строки типа жилья в зависимости от типа, указанного в массиве
 function getHomeType(homeVal) {
   var str = '';
   switch (homeVal) {
@@ -161,13 +248,16 @@ function createNotice(arr) {
   newNotice.querySelector('small').textContent = innHTMLArr[0];
   getElementP(newNotice, innHTMLArr);
   getListFeatures(newNotice, arr.offer.features, 'ul.popup__features');
+  newNotice.classList.add('hidden');
   return newNotice;
 }
 
 function renderElement(arrayName, creatingFunctionName, mapList, nextElement) {
   var fragment = document.createDocumentFragment();
-  fragment.appendChild(creatingFunctionName(arrayName[0]));
-  mapList.insertBefore(fragment, nextElement);
+  for (var i = 0; i < arrayName.length; i++) {
+    fragment.appendChild(creatingFunctionName(arrayName[i], i));
+    mapList.insertBefore(fragment, nextElement);
+  }
 }
 
 function renderNotice(arrayName, creatingFunctionName) {
@@ -175,5 +265,3 @@ function renderNotice(arrayName, creatingFunctionName) {
   var nextElement = document.querySelector('.map__filters-container');
   renderElement(arrayName, creatingFunctionName, mapList, nextElement);
 }
-
-renderNotice(listHouses, createNotice);
