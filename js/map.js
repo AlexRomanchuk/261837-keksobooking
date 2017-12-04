@@ -14,16 +14,16 @@ var housesMap = document.querySelector('.map__pins');
 var mapOpen = housesMap.querySelector('.map__pin--main');
 var noticeForm = document.querySelector('.notice__form');
 var map = document.querySelector('.map');
+var fields = noticeForm.getElementsByTagName('fieldset');
 
 // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
-function lockOrOpenFields(elemFields, disabledProperty) {
-  var fields = elemFields.getElementsByTagName('fieldset');
+function toggleFields(disabledProperty) {
   for (var i = 0; i < fields.length; i++) {
     fields[i].disabled = disabledProperty;
   }
 }
 
-lockOrOpenFields(noticeForm, 'disabled');
+toggleFields('disabled');
 
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
@@ -31,7 +31,7 @@ var noticeTemplate = document.querySelector('template').content.querySelector('a
 var openElements = function () {
   showBlock('.map');
   noticeForm.classList.remove('notice__form--disabled');
-  lockOrOpenFields(noticeForm, '');
+  toggleFields('');
   renderMapPins(listHouses, createMapPin);
   renderNotice(listHouses, createNotice);
   mapOpen.disabled = 'disabled';
@@ -39,29 +39,28 @@ var openElements = function () {
   // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
   var previousCard = -1;
 
+  var cards = map.querySelectorAll('.map__card');
+  var buttonsPopup = housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+
+  function openPopup(index) {
+    var currentCard = index;
+    buttonsPopup[index].classList.add('map__pin--active');
+    cards[index].classList.remove('hidden');
+    if (previousCard !== -1 && previousCard !== currentCard) {
+      closePopup(previousCard);
+    }
+    previousCard = currentCard;
+  }
+
+  function closePopup(index) {
+    cards[index].classList.add('hidden');
+    buttonsPopup[index].classList.remove('map__pin--active');
+    previousCard = -1;
+  }
+
   for (var i = 0; i < listHouses.length; i++) {
     (function (j) {
-      var cards = map.querySelectorAll('.map__card');
-      var buttonsPopup = housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
       var buttonClosePopup = cards[j].querySelector('.popup__close');
-
-      function openPopup(index) {
-        var currentCard = index;
-        buttonsPopup[index].classList.add('map__pin--active');
-        cards[index].classList.remove('hidden');
-        if (previousCard !== -1 && previousCard !== currentCard) {
-          closePopup(previousCard);
-        }
-        previousCard = currentCard;
-        document.addEventListener('keydown', onPopupEscPress);
-      }
-
-      function closePopup(index) {
-        cards[index].classList.add('hidden');
-        buttonsPopup[index].classList.remove('map__pin--active');
-        previousCard = -1;
-        document.addEventListener('keydown', onPopupEscPress);
-      }
 
       buttonsPopup[j].addEventListener('click', function () {
         openPopup(j);
@@ -83,11 +82,13 @@ var openElements = function () {
         }
       });
 
-      var onPopupEscPress = function (evt) {
+      function onPopupEscPress(evt) {
         if (evt.keyCode === ESC_KEYCODE) {
           closePopup(j);
         }
-      };
+      }
+
+      document.addEventListener('keydown', onPopupEscPress);
     })(i);
   }
 };
@@ -134,7 +135,7 @@ function shuffleArray(arr, n) {
 // Элементы не должны повторяться в окне объявления.
 var listTitles = shuffleArray(TITLES, TITLES.length);
 
-var renderListHouses = function (n) {
+function renderListHouses(n) {
   var arr = [];
   for (var i = 1; i <= n; i++) {
     var coordX = getRandomNumber(300, 900);
@@ -166,7 +167,7 @@ var renderListHouses = function (n) {
         });
   }
   return arr;
-};
+}
 
 var listHouses = renderListHouses(8);
 
