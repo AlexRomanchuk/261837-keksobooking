@@ -108,7 +108,7 @@ var inputCapacity = noticeForm.querySelector('#capacity');
 
 
 for (var i = 0; i < inputs.length; i++) {
-(function (input, j) {
+(function (input) {
   input.addEventListener('invalid', function () {
     input.style = 'background: #ffb8c2';
   });
@@ -176,28 +176,31 @@ for (var i = 0; i < inputs.length; i++) {
 var numberGuests = inputCapacity.querySelectorAll('option');
   (function (rooms, guests, index) {
     rooms.addEventListener('change', function () {
+      for (var i = 0; i < numberGuests.length; i++) {
+        numberGuests[i].classList.remove('hidden');
+      }
       switch (rooms.value) {
         case '1':
-          numberGuests[0].hidden = 'hidden';
-          numberGuests[1].hidden = 'hidden';
-          numberGuests[3].hidden = 'hidden';
+          numberGuests[0].classList.add('hidden');
+          numberGuests[1].classList.add('hidden');
+          numberGuests[3].classList.add('hidden');
           break;
         case '2':
-          numberGuests[0].hidden = 'hidden';
-          numberGuests[3].hidden = 'hidden';
+          numberGuests[0].classList.add('hidden');
+          numberGuests[3].classList.add('hidden');
           break;
         case '3':
-          numberGuests[3].hidden = 'hidden';
+          numberGuests[3].classList.add('hidden');
           break;
-        case '100':
-          numberGuests[2].hidden = 'hidden';
-          numberGuests[1].hidden = 'hidden';
-          numberGuests[0].hidden = 'hidden';
+        default:
+          numberGuests[2].classList.add('hidden');
+          numberGuests[1].classList.add('hidden');
+          numberGuests[0].classList.add('hidden');
           break;
       }
+     console.log(numberGuests[2].hidden);
     });
-})(inputRoom, inputCapacity, i);
-
+  })(inputRoom, inputCapacity, i);
 
 mapOpen.addEventListener('mouseup', function () {
   openElements();
