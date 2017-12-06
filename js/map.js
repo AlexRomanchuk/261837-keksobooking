@@ -28,7 +28,7 @@ toggleFields('disabled');
 // Шаблон
 var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-var openElements = function () {
+function openElements() {
   showBlock('.map');
   noticeForm.classList.remove('notice__form--disabled');
   toggleFields('');
@@ -92,6 +92,112 @@ var openElements = function () {
     })(i);
   }
 };
+
+
+var inputs = noticeForm.querySelectorAll('input');
+var selects = noticeForm.querySelectorAll('select');
+
+var inputTitle = noticeForm.querySelector('#title');
+var inputAddress = noticeForm.querySelector('#address');
+var inputPrice = noticeForm.querySelector('#price');
+var inputType = noticeForm.querySelector('#type');
+var inputTimein = noticeForm.querySelector('#timein');
+var inputTimeout = noticeForm.querySelector('#timeout');
+var inputRoom = noticeForm.querySelector('#room_number');
+var inputCapacity = noticeForm.querySelector('#capacity');
+
+
+for (var i = 0; i < inputs.length; i++) {
+(function (input, j) {
+  input.addEventListener('invalid', function () {
+    input.style = 'background: #ffb8c2';
+  });
+
+  inputTitle.addEventListener('invalid', function () {
+    if (inputTitle.validity.tooShort) {
+      inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символа.');
+    } else if (inputTitle.validity.tooLong) {
+      inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
+    } else if (inputTitle.validity.valueMissing) {
+      inputTitle.setCustomValidity('Заголовок должен быть указан.');
+    } else {
+      inputTitle.setCustomValidity('');
+    }
+  });
+
+  inputAddress.addEventListener('invalid', function () {
+    if (inputAddress.validity.valueMissing) {
+      inputAddress.setCustomValidity('Адрес должен быть указан.');
+    }
+  });
+
+  (function (type, price) {
+    type.addEventListener('change', function () {
+      if (type.value === 'bungalo') {
+        price.min = 0;
+      } else if (type.value === 'flat') {
+        price.min = 1000;
+      } else if (type.value === 'house') {
+        price.min = 5000;
+      } else {
+        price.min = 10000;
+      }
+    });
+  })(inputType, inputPrice);
+
+  inputPrice.addEventListener('invalid', function () {
+    if (inputPrice.validity.valueMissing) {
+      inputPrice.setCustomValidity('Цена должна быть указана.');
+    } else if (inputPrice.validity.rangeUnderflow) {
+      inputPrice.setCustomValidity('Цена слишком мала.');
+    } else if (inputPrice.validity.rangeOverflow) {
+      inputPrice.setCustomValidity('Цена слишком велика.');
+    } else {
+      inputPrice.setCustomValidity('');
+    }
+  });
+})(inputs[i]);
+
+(function (timein, timeout) {
+  timein.addEventListener('change', function () {
+    if (timein.value !== timeout.value) {
+      timeout.value = timein.value;
+    }
+  });
+
+  timeout.addEventListener('change', function () {
+    if (timeout.value !== timein.value) {
+      timein.value = timeout.value;
+    }
+  });
+})(inputTimein, inputTimeout);
+}
+
+var numberGuests = inputCapacity.querySelectorAll('option');
+  (function (rooms, guests, index) {
+    rooms.addEventListener('change', function () {
+      switch (rooms.value) {
+        case '1':
+          numberGuests[0].hidden = 'hidden';
+          numberGuests[1].hidden = 'hidden';
+          numberGuests[3].hidden = 'hidden';
+          break;
+        case '2':
+          numberGuests[0].hidden = 'hidden';
+          numberGuests[3].hidden = 'hidden';
+          break;
+        case '3':
+          numberGuests[3].hidden = 'hidden';
+          break;
+        case '100':
+          numberGuests[2].hidden = 'hidden';
+          numberGuests[1].hidden = 'hidden';
+          numberGuests[0].hidden = 'hidden';
+          break;
+      }
+    });
+})(inputRoom, inputCapacity, i);
+
 
 mapOpen.addEventListener('mouseup', function () {
   openElements();
