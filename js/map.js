@@ -93,6 +93,8 @@ function openElements() {
   }
 }
 
+// Форма
+
 var inputTitle = noticeForm.querySelector('#title');
 var inputAddress = noticeForm.querySelector('#address');
 var inputPrice = noticeForm.querySelector('#price');
@@ -101,77 +103,49 @@ var inputTimein = noticeForm.querySelector('#timein');
 var inputTimeout = noticeForm.querySelector('#timeout');
 var inputRooms = noticeForm.querySelector('#room_number');
 var inputCapacity = noticeForm.querySelector('#capacity');
+var submitButton = noticeForm.querySelector('.form__submit');
 
-(function (rooms, guests) {
-  var numberGuests = guests.querySelectorAll('option');
-  rooms.addEventListener('change', function () {
-    for (var i = 0; i < numberGuests.length; i++) {
-      numberGuests[i].classList.remove('hidden');
+function markInvalidField(input) {
+  input.style = 'background: #ffb8c2';
+}
+
+(function () {
+  submitButton.addEventListener('click', function () {
+
+    markInvalidField(inputTitle);
+    markInvalidField(inputAddress);
+    markInvalidField(inputPrice);
+
+    if (inputTitle.validity.tooShort) {
+      inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символов.');
+    } else if (inputTitle.validity.tooLong) {
+      inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
+    } else if (inputTitle.validity.valueMissing) {
+      inputTitle.setCustomValidity('Заголовок должен быть указан.');
+    } else {
+      inputTitle.setCustomValidity('');
+      inputTitle.style = '';
     }
-    switch (rooms.value) {
-      case '1':
-        guests.value = '1';
-        numberGuests[0].classList.add('hidden');
-        numberGuests[1].classList.add('hidden');
-        numberGuests[3].classList.add('hidden');
-        break;
-      case '2':
-        guests.value = '2';
-        numberGuests[0].classList.add('hidden');
-        numberGuests[3].classList.add('hidden');
-        break;
-      case '3':
-        guests.value = '3';
-        numberGuests[3].classList.add('hidden');
-        break;
-      default:
-        guests.value = '0';
-        numberGuests[2].classList.add('hidden');
-        numberGuests[1].classList.add('hidden');
-        numberGuests[0].classList.add('hidden');
-        break;
+
+    if (inputAddress.validity.valueMissing) {
+      inputAddress.setCustomValidity('Адрес должен быть указан.');
+    } else {
+      inputAddress.setCustomValidity('');
+      inputAddress.style = '';
+    }
+
+    if (inputPrice.validity.valueMissing) {
+      inputPrice.setCustomValidity('Цена должна быть указана.');
+    } else if (inputPrice.validity.rangeUnderflow) {
+      inputPrice.setCustomValidity('Цена слишком мала. Необходимо указать минимум ' + inputPrice.min + ' руб.');
+    } else if (inputPrice.validity.rangeOverflow) {
+      inputPrice.setCustomValidity('Цена слишком велика. Нужно указать не более ' + inputPrice.max + ' руб.');
+    } else {
+      inputPrice.setCustomValidity('');
+      inputPrice.style = '';
     }
   });
-})(inputRooms, inputCapacity);
-
-var inputs = noticeForm.querySelectorAll('input');
-
-for (var j = 0; j < inputs.length; j++) {
-  (function (input) {
-    input.addEventListener('invalid', function () {
-      input.style = 'background: #ffb8c2';
-
-      if (inputTitle.validity.tooShort) {
-        inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символов.');
-      } else if (inputTitle.validity.tooLong) {
-        inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
-      } else if (inputTitle.validity.valueMissing) {
-        inputTitle.setCustomValidity('Заголовок должен быть указан.');
-      } else {
-        inputTitle.setCustomValidity('');
-        inputTitle.style = '';
-      }
-
-      if (inputAddress.validity.valueMissing) {
-        inputAddress.setCustomValidity('Адрес должен быть указан.');
-      } else {
-        inputAddress.setCustomValidity('');
-        inputAddress.style = '';
-      }
-
-      if (inputPrice.validity.valueMissing) {
-        inputPrice.setCustomValidity('Цена должна быть указана.');
-      } else if (inputPrice.validity.rangeUnderflow) {
-        inputPrice.setCustomValidity('Цена слишком мала. Необходимо указать минимум ' + inputPrice.min + ' руб.');
-      } else if (inputPrice.validity.rangeOverflow) {
-        inputPrice.setCustomValidity('Цена слишком велика. Нужно указать не более ' + inputPrice.max + ' руб.');
-      } else {
-        inputPrice.setCustomValidity('');
-        inputPrice.style = '';
-      }
-    });
-  })(inputs[j]);
-}
+})();
 
 function createArrayValues(list) {
   var arr = [];
@@ -182,28 +156,49 @@ function createArrayValues(list) {
 }
 
 function sinchronizeFields(inputIn, inputOut, arrayValuesIn, arrayValuesOut, callback) {
-  inputIn.addEventListener('input', function (evt) {
-    for (var i = 0; i < arrayValuesIn.length; i++) {
-      var currentValue = evt.target.value;
-      if (arrayValuesIn[i] === currentValue) {
-        callback(arrayValuesOut[i], inputOut);
-      }
-    }
+  inputIn.addEventListener('input', function () {
+    var currentValue = inputIn.value;
+    var i = arrayValuesIn.indexOf(currentValue);
+    var valueOut = arrayValuesOut[i];
+    callback(valueOut, inputOut);
   });
 }
 
 var timeinList = createArrayValues(inputTimein.querySelectorAll('option'));
 var timeoutList = createArrayValues(inputTimeout.querySelectorAll('option'));
 
-sinchronizeFields(inputTimein, inputTimeout, timeinList, timeoutList, function (arrayValuesOut, inputOut) {
-  inputOut.value = arrayValuesOut;
+sinchronizeFields(inputTimein, inputTimeout, timeinList, timeoutList, function (valueOut, inputOut) {
+  inputOut.value = valueOut;
+  inputOut.addEventListener('input', function () {
+    inputTimein.value = inputOut.value;
+  });
 });
 
 var typeList = createArrayValues(inputType.querySelectorAll('option'));
 var minList = [1000, 0, 5000, 10000];
 
-sinchronizeFields(inputType, inputPrice, typeList, minList, function (arrayValuesOut, inputOut) {
-  inputOut.min = arrayValuesOut;
+sinchronizeFields(inputType, inputPrice, typeList, minList, function (valueOut, inputOut) {
+  inputOut.min = valueOut;
+});
+
+var roomsList = createArrayValues(inputRooms.querySelectorAll('option'));
+var capacityList = createArrayValues(inputCapacity.querySelectorAll('option'));
+
+sinchronizeFields(inputRooms, inputCapacity, roomsList, capacityList, function (valueOut, inputOut) {
+  var listOfGuests = inputCapacity.querySelectorAll('option');
+  inputOut.value = inputRooms.value;
+  for (var i = 0; i < listOfGuests.length; i++) {
+    listOfGuests[i].classList.add('hidden');
+  }
+  var currentIndex = capacityList.indexOf(inputOut.value);
+  var lastIndex = capacityList.indexOf('0');
+  if (inputRooms.value !== '100') {
+    for (var j = (lastIndex - 1); j >= currentIndex; j--) {
+      listOfGuests[j].classList.remove('hidden');
+    }
+  } else {
+    inputOut.value = '0';
+  }
 });
 
 mapOpen.addEventListener('mouseup', function () {
