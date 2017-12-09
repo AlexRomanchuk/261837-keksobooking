@@ -185,20 +185,7 @@ var roomsList = createArrayValues(inputRooms.querySelectorAll('option'));
 var capacityList = createArrayValues(inputCapacity.querySelectorAll('option'));
 
 sinchronizeFields(inputRooms, inputCapacity, roomsList, capacityList, function (valueOut, inputOut) {
-  var listOfGuests = inputCapacity.querySelectorAll('option');
-  inputOut.value = inputRooms.value;
-  for (var i = 0; i < listOfGuests.length; i++) {
-    listOfGuests[i].classList.add('hidden');
-  }
-  var currentIndex = capacityList.indexOf(inputOut.value);
-  var lastIndex = capacityList.indexOf('0');
-  if (inputRooms.value !== '100') {
-    for (var j = (lastIndex - 1); j >= currentIndex; j--) {
-      listOfGuests[j].classList.remove('hidden');
-    }
-  } else {
-    inputOut.value = '0';
-  }
+  inputOut.value = (inputRooms.value !== '100') ? inputRooms.value : 0;
 });
 
 mapOpen.addEventListener('mouseup', function () {
