@@ -23,7 +23,7 @@
     }
   }
 
-      // Функция предварительного удаления элементов списка ul, взятых из шаблона и вставка элементов из массива
+  // Функция предварительного удаления элементов списка ul, взятых из шаблона и вставка элементов из массива
   function getListFeatures(newElement, arrayFeatures, nameSelector) {
     var deleteElem = newElement.querySelector(nameSelector);
     removeChildren(deleteElem);

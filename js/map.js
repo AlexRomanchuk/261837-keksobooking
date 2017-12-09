@@ -65,7 +65,7 @@
 
         function onPopupEscPress(evt) {
           if (evt.keyCode === window.data.escKeycode) {
-          closePopup(j);
+            closePopup(j);
           }
         }
 

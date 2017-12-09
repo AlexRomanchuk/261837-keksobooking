@@ -8,7 +8,7 @@ window.data = (function () {
   var TYPE_HOME = ['flat', 'bungalo', 'house'];
   var CHECKIN = ['12:00', '13:00', '14:00'];
   var CHECKOUT = ['12:00', '13:00', '14:00'];
-  
+
   var HOUSES_MAP = document.querySelector('.map__pins');
   var NOTICE_FORM = document.querySelector('.notice__form');
   var MAP = document.querySelector('.map');
@@ -26,7 +26,7 @@ window.data = (function () {
     return arr[getRandomNumber(0, arr.length - 1)];
   }
 
-// Функция случайной сборки массива из элементов копии основного массива
+  // Функция случайной сборки массива из элементов копии основного массива
   function shuffleArray(arr, n) {
     var collection = arr.slice(0);
     var newArr = [];
