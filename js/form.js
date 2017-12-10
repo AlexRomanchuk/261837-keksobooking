@@ -17,43 +17,44 @@
     input.style = 'background: #ffb8c2';
   }
 
-  (function () {
-    submitButton.addEventListener('click', function () {
+  function validityForm() {
+    markInvalidField(inputTitle);
+    markInvalidField(inputAddress);
+    markInvalidField(inputPrice);
 
-      markInvalidField(inputTitle);
-      markInvalidField(inputAddress);
-      markInvalidField(inputPrice);
+    if (inputTitle.validity.tooShort) {
+      inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символов.');
+    } else if (inputTitle.validity.tooLong) {
+      inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
+    } else if (inputTitle.validity.valueMissing) {
+      inputTitle.setCustomValidity('Заголовок должен быть указан.');
+    } else {
+      inputTitle.setCustomValidity('');
+      inputTitle.style = '';
+    }
 
-      if (inputTitle.validity.tooShort) {
-        inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символов.');
-      } else if (inputTitle.validity.tooLong) {
-        inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
-      } else if (inputTitle.validity.valueMissing) {
-        inputTitle.setCustomValidity('Заголовок должен быть указан.');
-      } else {
-        inputTitle.setCustomValidity('');
-        inputTitle.style = '';
-      }
+    if (inputAddress.validity.valueMissing) {
+      inputAddress.setCustomValidity('Адрес должен быть указан.');
+    } else {
+      inputAddress.setCustomValidity('');
+      inputAddress.style = '';
+    }
 
-      if (inputAddress.validity.valueMissing) {
-        inputAddress.setCustomValidity('Адрес должен быть указан.');
-      } else {
-        inputAddress.setCustomValidity('');
-        inputAddress.style = '';
-      }
+    if (inputPrice.validity.valueMissing) {
+      inputPrice.setCustomValidity('Цена должна быть указана.');
+    } else if (inputPrice.validity.rangeUnderflow) {
+      inputPrice.setCustomValidity('Цена слишком мала. Необходимо указать минимум ' + inputPrice.min + ' руб.');
+    } else if (inputPrice.validity.rangeOverflow) {
+      inputPrice.setCustomValidity('Цена слишком велика. Нужно указать не более ' + inputPrice.max + ' руб.');
+    } else {
+      inputPrice.setCustomValidity('');
+      inputPrice.style = '';
+    }
+  }
 
-      if (inputPrice.validity.valueMissing) {
-        inputPrice.setCustomValidity('Цена должна быть указана.');
-      } else if (inputPrice.validity.rangeUnderflow) {
-        inputPrice.setCustomValidity('Цена слишком мала. Необходимо указать минимум ' + inputPrice.min + ' руб.');
-      } else if (inputPrice.validity.rangeOverflow) {
-        inputPrice.setCustomValidity('Цена слишком велика. Нужно указать не более ' + inputPrice.max + ' руб.');
-      } else {
-        inputPrice.setCustomValidity('');
-        inputPrice.style = '';
-      }
-    });
-  })();
+  submitButton.addEventListener('click', function () {
+    validityForm();
+  });
 
   function createArrayValues(list) {
     var arr = [];
