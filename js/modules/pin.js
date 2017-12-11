@@ -1,8 +1,9 @@
 ﻿'use strict';
 
 window.pin = (function () {
-  var width = 20;
-  var heigth = 44;
+  var PIN_CENTER = 20; // середина кнопки .map__pin
+  var PIN_HEIGTH = 44;
+  var AVATAR_SIZE = 40; // ширина и высота аватарки равны
 
   function render(arrayAvatars, creatingFunctionName) {
     var mapList = document.querySelector('.map__pins');
@@ -18,11 +19,11 @@ window.pin = (function () {
       function createElement(arrAvatars) {
         var newMapPin = document.createElement('button');
         newMapPin.className = 'map__pin';
-        newMapPin.style.left = (arrAvatars.location.x + width) + 'px';
-        newMapPin.style.top = (arrAvatars.location.y + heigth) + 'px';
+        newMapPin.style.left = (arrAvatars.location.x + PIN_CENTER) + 'px';
+        newMapPin.style.top = (arrAvatars.location.y + PIN_HEIGTH) + 'px';
         var newAvatar = document.createElement('img');
-        newAvatar.width = 40;
-        newAvatar.heigth = 40;
+        newAvatar.width = AVATAR_SIZE;
+        newAvatar.heigth = AVATAR_SIZE;
         newAvatar.src = arrAvatars.author.avatar;
         newAvatar.draggable = false;
         newMapPin.appendChild(newAvatar);
