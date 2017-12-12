@@ -64,36 +64,33 @@
     return arr;
   }
 
-  function sinchronizeFields(inputIn, inputOut, arrayValuesIn, arrayValuesOut, callback) {
-    inputIn.addEventListener('input', function () {
-      var currentValue = inputIn.value;
-      var i = arrayValuesIn.indexOf(currentValue);
-      var valueOut = arrayValuesOut[i];
-      callback(valueOut, inputOut);
+  function syncValues(value, elem) {
+    elem.value = value;
+    elem.addEventListener('input', function () {
+      inputTimein.value = elem.value;
     });
+  }
+
+  function syncValuesWithMin(value, elem) {
+    elem.min = value;
+  }
+
+  function syncCapacity(value, elem) {
+    elem.value = (inputRooms.value !== '100') ? inputRooms.value : '0';
   }
 
   var timeinList = createArrayValues(inputTimein.querySelectorAll('option'));
   var timeoutList = createArrayValues(inputTimeout.querySelectorAll('option'));
 
-  sinchronizeFields(inputTimein, inputTimeout, timeinList, timeoutList, function (valueOut, inputOut) {
-    inputOut.value = valueOut;
-    inputOut.addEventListener('input', function () {
-      inputTimein.value = inputOut.value;
-    });
-  });
+  window.synchronizeFields(inputTimein, inputTimeout, timeinList, timeoutList, syncValues);
 
   var typeList = createArrayValues(inputType.querySelectorAll('option'));
   var minList = [1000, 0, 5000, 10000];
 
-  sinchronizeFields(inputType, inputPrice, typeList, minList, function (valueOut, inputOut) {
-    inputOut.min = valueOut;
-  });
+  window.synchronizeFields(inputType, inputPrice, typeList, minList, syncValuesWithMin);
 
   var roomsList = createArrayValues(inputRooms.querySelectorAll('option'));
   var capacityList = createArrayValues(inputCapacity.querySelectorAll('option'));
 
-  sinchronizeFields(inputRooms, inputCapacity, roomsList, capacityList, function (valueOut, inputOut) {
-    inputOut.value = (inputRooms.value !== '100') ? inputRooms.value : '0';
-  });
+  window.synchronizeFields(inputRooms, inputCapacity, roomsList, capacityList, syncCapacity);
 })();
