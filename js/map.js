@@ -89,4 +89,55 @@
   function showBlock() {
     window.data.map.classList.remove('map--faded');
   }
+
+  var startCoords = 0;
+  var addressPin = window.data.mapOpen.querySelector('img');
+
+  addressPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  var MIN_Y = 100; // миимальная ордината, выше которой флажок адреса поднять нельзя
+  var MAX_Y = 500; // максимальая ордината, ниже которой флажок адреса опустить нельзя
+  var ADDRESS_PIN_HEIGTH = 65;
+  var minCurrentY = MIN_Y - ADDRESS_PIN_HEIGTH;
+  var maxCurrentY = MAX_Y - ADDRESS_PIN_HEIGTH; // учет высоты флажка
+
+  function onMouseMove(moveEvt) {
+    moveEvt.preventDefault();
+
+    var drag = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY,
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    var currentX = (window.data.mapOpen.offsetLeft - drag.x);
+    var currentY = (window.data.mapOpen.offsetTop - drag.y);
+
+    // Ограничение движения флажка адреса по вертикали. флажок упирается в "невидимые барьеры"
+    currentY = Math.min(Math.max(currentY, minCurrentY), maxCurrentY);
+
+    window.data.mapOpen.style.top = currentY + 'px';
+    window.data.mapOpen.style.left = currentX + 'px';
+    window.data.noticeForm.querySelector('#address').value = 'x: ' + currentX + ', y: ' + (currentY + ADDRESS_PIN_HEIGTH);
+  }
+
+  function onMouseUp(upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
 })();
