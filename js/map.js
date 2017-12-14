@@ -10,12 +10,13 @@
 
   toggleFields('disabled');
 
-  function openElements() {
+  function createMapElements(listHouses) {
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
     toggleFields('');
-    window.pin.renderMapPins(window.data.listHouses);
+    window.pin.renderMapPins(listHouses);
     window.data.mapOpen.disabled = 'disabled';
+    window.renderCard(listHouses);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
@@ -29,7 +30,7 @@
       window.previousCard = -1;
     }
 
-    for (var i = 0; i < window.data.listHouses.length; i++) {
+    for (var i = 0; i < listHouses.length; i++) {
       (function (j) {
         var buttonClosePopup = window.cards[j].querySelector('.popup__close');
 
@@ -62,6 +63,10 @@
         document.addEventListener('keydown', onPopupEscPress);
       })(i);
     }
+  }
+
+  function openElements() {
+    window.backend.load(createMapElements, window.messageError);
   }
 
 

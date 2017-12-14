@@ -56,6 +56,13 @@
     validityForm();
   });
 
+  noticeForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(noticeForm), function () {
+      noticeForm.reset();
+    });
+    evt.preventDefault();
+  }, window.messageError);
+
   function createArrayValues(list) {
     var arr = [];
     for (var i = 0; i < list.length; i++) {

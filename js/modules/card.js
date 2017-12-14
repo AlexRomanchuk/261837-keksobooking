@@ -1,6 +1,7 @@
 ﻿'use strict';
-(function () {
-  var listHouses = window.data.listHouses;
+
+window.renderCard = function (data) {
+  var arrayData = data;
   function getHomeType(homeVal) {
     var str = '';
     switch (homeVal) {
@@ -64,11 +65,11 @@
     }
   }
 
-  function renderNotice(arrayName, creatingFunctionName) {
+  function renderNotice(arrayName, creatingFunction) {
     var mapList = window.data.map;
     var nextElement = document.querySelector('.map__filters-container');
-    renderElement(arrayName, creatingFunctionName, mapList, nextElement);
+    renderElement(arrayName, creatingFunction, mapList, nextElement);
   }
 
-  renderNotice(listHouses, createNotice);
-})();
+  renderNotice(arrayData, createNotice);
+};
