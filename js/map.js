@@ -1,8 +1,6 @@
 ﻿'use strict';
 
 (function () {
-  var MAXIMUM_PINS = 5;
-
   // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
   function toggleFields(disabledProperty) {
     for (var i = 0; i < window.data.fields.length; i++) {
@@ -12,19 +10,19 @@
 
   toggleFields('disabled');
 
-  function showPins(buttons, array) {
-    var takeNumber = Math.min(array.length, MAXIMUM_PINS);
-    for (var i = 0; i < takeNumber; i++) {
-      buttons[i].classList.remove('hidden');
+  window.updatePins = function (origin, filtered, buttons) {
+    for (var t = 0; t < buttons.length; t++) {
+      buttons[t].classList.add('hidden');
     }
-  }
+    for (var i = 0; i < filtered.length; i++) {
+      var j = origin.indexOf(filtered[i]);
+      buttons[j].classList.remove('hidden');
+    }
+  };
 
   function createMapElements(data) {
-    console.log(data);
-    var filtersForm = window.data.map.querySelector('form');
-    var filters = filtersForm.querySelectorAll('select');
-    var features = filtersForm.querySelector('fieldset').querySelectorAll('input');
     var listHouses = data;
+    window.filters.getArrayData(listHouses);
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
     toggleFields('');
@@ -32,8 +30,7 @@
     window.data.mapOpen.disabled = 'disabled';
     window.renderCard(listHouses);
     window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
-
-    showPins(window.buttonsPopup, listHouses);
+    window.updatePins(listHouses, window.filters.filtered, window.buttonsPopup);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
@@ -49,7 +46,6 @@
     for (var i = 0; i < listHouses.length; i++) {
       (function (j) {
         var buttonClosePopup = window.cards[j].querySelector('.popup__close');
-
         window.buttonsPopup[j].addEventListener('click', function () {
           window.showCard(j, closePopup);
         });

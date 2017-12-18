@@ -1,14 +1,14 @@
 ﻿'use strict';
 
 window.filters = (function () {
-  var MAX_PINS = 5;
-  var arrTempData = [];
+  var MAXIMUM_PINS = 5;
+  var copyOfData = [];
   var objectValues = {
     'housing-type': 'any',
     'housing-price': 'any',
     'housing-rooms': 'any',
     'housing-guests': 'any'
-  }
+  };
   var checkedFeatures = [];
   var filterForm = document.querySelector('.map__filters');
   var filterType = filterForm.querySelector('#housing-type');
@@ -21,7 +21,7 @@ window.filters = (function () {
     // тип жилья
     function (arr) {
       if (objectValues['housing-type'] !== 'any') {
-        arr = array.filter(function(array) {
+        arr = arr.filter(function (array) {
           return array.offer.type === objectValues['housing-type'];
         });
       }
@@ -53,8 +53,8 @@ window.filters = (function () {
     // количество комнат
     function (arr) {
       if (objectValues['housing-rooms'] !== 'any') {
-        arr = array.filter(function(array) {
-          return array.offer.rooms === objectValues['housing-rooms'];
+        arr = arr.filter(function (array) {
+          return array.offer.rooms === +objectValues['housing-rooms'];
         });
       }
       return arr;
@@ -62,8 +62,8 @@ window.filters = (function () {
     // количество гостей
     function (arr) {
       if (objectValues['housing-guests'] !== 'any') {
-        arr = array.filter(function(array) {
-          return array.offer.guests === objectValues['housing-guests'];
+        arr = arr.filter(function (array) {
+          return array.offer.guests === +objectValues['housing-guests'];
         });
       }
       return arr;
@@ -77,21 +77,24 @@ window.filters = (function () {
       });
     }
   ];
+
   // обработка событий изменения фильтров
   function filterChangeHandler(evt) {
-    objectValues[evt.target.nae] = evt.target.value;
-    window.filters.filtered = arrTempData.slice();
+    objectValues[evt.target.name] = evt.target.value;
+    window.filters.filtered = copyOfData.slice();
     var checkedElements = filterFeatures.querySelectorAll('input[type="checkbox"]:checked');
     checkedFeatures = [].map.call(checkedElements, function (array) {
       return array.value;
     });
-    rrFunctionFilters.forEach(function (array) {
-      window.mapFilters.filtered = array(window.mapFilters.filtered);
+    functionsFilter.forEach(function (array) {
+      window.filters.filtered = array(window.filters.filtered);
     });
-    // обрезка полученного массива до необходимой длинны
-    if (window.mapFilters.filtered.length > MAX_PINS) {
-      window.mapFilters.filtered = window.mapFilters.filtered.slice(0, MAX_PINS);
+    // обрезка полученного массива до необходимой длины
+    if (window.filters.filtered.length > MAXIMUM_PINS) {
+      window.filters.filtered = window.filters.filtered.slice(0, MAXIMUM_PINS);
     }
+    console.log(window.filters.filtered);
+    window.updatePins(copyOfData, window.filters.filtered, window.buttonsPopup);
   }
 
   filterType.addEventListener('change', filterChangeHandler);
@@ -102,10 +105,9 @@ window.filters = (function () {
 
   return {
     filtered: [],
-    summary: function (arr) {
-      arrTempData = arr.slice();
-      this.filtered = arr.slice();
-      return arrTempData.slice(0, MAX_PINS);
+    getArrayData: function (arr) {
+      copyOfData = arr.slice();
+      this.filtered = arr.slice(0, MAXIMUM_PINS);
     }
   };
 })();
