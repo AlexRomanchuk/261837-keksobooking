@@ -2,6 +2,7 @@
 
 window.filters = (function () {
   var MAXIMUM_PINS = 5;
+  var timer = 500;
   var copyOfData = [];
   var objectValues = {
     'housing-type': 'any',
@@ -93,8 +94,9 @@ window.filters = (function () {
     if (window.filters.filtered.length > MAXIMUM_PINS) {
       window.filters.filtered = window.filters.filtered.slice(0, MAXIMUM_PINS);
     }
-    console.log(window.filters.filtered);
-    window.updatePins(copyOfData, window.filters.filtered, window.buttonsPopup);
+    var doWithDebounce = window.debounce(copyOfData, window.filters.filtered, window.buttonsPopup, window.updatePins, timer);
+    /* window.updatePins(copyOfData, window.filters.filtered, window.buttonsPopup); */
+    doWithDebounce();
   }
 
   filterType.addEventListener('change', filterChangeHandler);

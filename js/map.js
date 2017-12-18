@@ -20,8 +20,7 @@
     }
   };
 
-  function createMapElements(data) {
-    var listHouses = data;
+  function createMapElements(listHouses) {
     window.filters.getArrayData(listHouses);
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
