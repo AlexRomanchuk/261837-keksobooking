@@ -1,6 +1,8 @@
 ﻿'use strict';
 
 (function () {
+  var MAXIMUM_PINS = 5;
+
   // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
   function toggleFields(disabledProperty) {
     for (var i = 0; i < window.data.fields.length; i++) {
@@ -10,19 +12,33 @@
 
   toggleFields('disabled');
 
-  function createMapElements(listHouses) {
+  function showPins(buttons, array) {
+    var takeNumber = Math.min(array.length, MAXIMUM_PINS);
+    for (var i = 0; i < takeNumber; i++) {
+      buttons[i].classList.remove('hidden');
+    }
+  }
+
+  function createMapElements(data) {
+    console.log(data);
+    var filtersForm = window.data.map.querySelector('form');
+    var filters = filtersForm.querySelectorAll('select');
+    var features = filtersForm.querySelector('fieldset').querySelectorAll('input');
+    var listHouses = data;
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
     toggleFields('');
     window.pin.renderMapPins(listHouses);
     window.data.mapOpen.disabled = 'disabled';
     window.renderCard(listHouses);
+    window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+
+    showPins(window.buttonsPopup, listHouses);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
 
     window.cards = window.data.map.querySelectorAll('.map__card');
-    window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
 
     function closePopup(index) {
       window.cards[index].classList.add('hidden');
