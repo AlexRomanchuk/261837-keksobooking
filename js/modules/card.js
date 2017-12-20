@@ -3,19 +3,14 @@
   window.renderCard = function (data) {
     var arrayData = data;
     function getHomeType(homeVal) {
-      var str = '';
       switch (homeVal) {
         case 'flat':
-          str = 'Квартира';
-          break;
+          return 'Квартира';
         case 'bungalo':
-          str = 'Бунгало';
-          break;
+          return 'Бунгало';
         default:
-          str = 'Дом';
-          break;
+          return 'Дом';
       }
-      return str;
     }
     // Функция удаления всех элементов
     function removeChildren(elem) {

@@ -10,6 +10,13 @@ window.filters = (function () {
   var housingValues = [];
   var featuresValues = [];
 
+  var externalCallback = 0;
+  var doWithDebounce = window.debounce(function () {
+    if (externalCallback) {
+      externalCallback();
+    }
+  }, TIMER);
+
   function getSelectedValues() {
     FILTER_SELECT_ID.forEach(function (item) {
       var selectNode = filterForm.querySelector('#' + item);
@@ -70,7 +77,7 @@ window.filters = (function () {
       return data.filter(isCorrect);
     },
     onFilterChange: function (callback) {
-      var doWithDebounce = window.debounce(callback, TIMER);
+      externalCallback = callback;
       filterForm.addEventListener('change', doWithDebounce);
     }
   };

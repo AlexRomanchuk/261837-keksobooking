@@ -1,7 +1,5 @@
 ﻿'use strict';
 (function () {
-  var MAXIMUM_PINS = 5;
-
   // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
   function toggleFields(disabledProperty) {
     for (var i = 0; i < window.data.fields.length; i++) {
@@ -11,21 +9,20 @@
 
   toggleFields('disabled');
 
-  var showPins = function (buttons) {
-    for (var i = 0; i < MAXIMUM_PINS; i++) {
-      buttons[i].classList.remove('hidden');
+  function clearMap() {
+    var pins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+    for (var i = 0; i < pins.length; i++) {
+      if (pins) {
+        window.data.housesMap.removeChild(pins[i]);
+      }
     }
-  };
-
-  var updatePins = function (origin, filtered, buttons) {
-    for (var t = 0; t < buttons.length; t++) {
-      buttons[t].classList.add('hidden');
+    var cards = window.data.map.querySelectorAll('.map__card');
+    for (var j = 0; j < cards.length; j++) {
+      if (cards) {
+        window.data.map.removeChild(cards[j]);
+      }
     }
-    for (var i = 0; i < Math.min(MAXIMUM_PINS, filtered.length); i++) {
-      var j = origin.indexOf(filtered[i]);
-      buttons[j].classList.remove('hidden');
-    }
-  };
+  }
 
   function createMapElements(listHouses) {
     showBlock('.map');
@@ -35,59 +32,65 @@
     window.data.mapOpen.disabled = 'disabled';
     window.renderCard(listHouses);
     window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
-    showPins(window.buttonsPopup);
 
-
-    var showFilteredPins = function () {
+    function renderFilteredPins() {
+      clearMap();
       var filtered = window.filters.applyFilters(listHouses);
-      updatePins(listHouses, filtered, window.buttonsPopup);
-    };
+      window.pin.renderMapPins(filtered);
+      var newPins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+      window.renderCard(filtered);
+      var newCards = window.data.map.querySelectorAll('.map__card');
+      addEventClick(newPins, newCards, filtered);
+    }
 
-    window.filters.onFilterChange(showFilteredPins);
+    window.filters.onFilterChange(renderFilteredPins);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
-
     window.cards = window.data.map.querySelectorAll('.map__card');
 
-    function closePopup(index) {
-      window.cards[index].classList.add('hidden');
-      window.buttonsPopup[index].classList.remove('map__pin--active');
+    function closePopup(cards, buttons, index) {
+      cards[index].classList.add('hidden');
+      buttons[index].classList.remove('map__pin--active');
       window.previousCard = -1;
     }
 
-    for (var i = 0; i < listHouses.length; i++) {
-      (function (j) {
-        var buttonClosePopup = window.cards[j].querySelector('.popup__close');
-        window.buttonsPopup[j].addEventListener('click', function () {
-          window.showCard(j, closePopup);
-        });
+    function addEventClick(buttons, cards, array) {
+      for (var i = 0; i < Math.min(array.length, window.data.maximumPins); i++) {
+        (function (j) {
+          var buttonClosePopup = cards[j].querySelector('.popup__close');
+          buttons[j].addEventListener('click', function () {
+            window.showCard(buttons, cards, j, closePopup);
+          });
 
-        window.buttonsPopup[j].addEventListener('keydown', function (evt) {
-          if (evt.keyCode === window.data.enterKeycode) {
-            window.showCard(j, closePopup);
+          buttons[j].addEventListener('keydown', function (evt) {
+            if (evt.keyCode === window.data.enterKeycode) {
+              window.showCard(buttons, cards, j, closePopup);
+            }
+          });
+
+          buttonClosePopup.addEventListener('click', function () {
+            closePopup(cards, buttons, j);
+          });
+
+          buttonClosePopup.addEventListener('keydown', function (evt) {
+            if (evt.keyCode === window.data.enterKeycode) {
+              closePopup(cards, buttons, j);
+            }
+          });
+
+          function onPopupEscPress(evt) {
+            if (evt.keyCode === window.data.escKeycode) {
+              closePopup(j);
+            }
           }
-        });
 
-        buttonClosePopup.addEventListener('click', function () {
-          closePopup(j);
-        });
-
-        buttonClosePopup.addEventListener('keydown', function (evt) {
-          if (evt.keyCode === window.data.enterKeycode) {
-            closePopup(j);
-          }
-        });
-
-        function onPopupEscPress(evt) {
-          if (evt.keyCode === window.data.escKeycode) {
-            closePopup(j);
-          }
-        }
-
-        document.addEventListener('keydown', onPopupEscPress);
-      })(i);
+          document.addEventListener('keydown', onPopupEscPress);
+        })(i);
+      }
     }
+
+    addEventClick(window.buttonsPopup, window.cards, listHouses);
   }
 
   function openElements() {

@@ -7,7 +7,7 @@ window.pin = (function () {
   function render(arrayAvatars, creatingFunctionName) {
     var mapList = document.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < arrayAvatars.length; i++) {
+    for (var i = 0; i < Math.min(arrayAvatars.length, window.data.maximumPins); i++) {
       fragment.appendChild(creatingFunctionName(arrayAvatars[i], i));
     }
     mapList.appendChild(fragment);
@@ -26,7 +26,6 @@ window.pin = (function () {
         newAvatar.src = arrAvatars.author.avatar;
         newAvatar.draggable = false;
         newMapPin.appendChild(newAvatar);
-        newMapPin.classList.add('hidden');
         return newMapPin;
       }
       render(array, createElement);
