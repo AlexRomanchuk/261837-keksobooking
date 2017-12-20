@@ -10,6 +10,21 @@
 
   toggleFields('disabled');
 
+  function clearMap() {
+    var pins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+    for (var i = 0; i < pins.length; i++) {
+      if (pins) {
+        window.data.housesMap.removeChild(pins[i]);
+      }
+    }
+    var cards = window.data.map.querySelectorAll('.map__card');
+    for (var j = 0; j < cards.length; j++) {
+      if (cards) {
+        window.data.map.removeChild(cards[j]);
+      }
+    }
+  }
+
   function createMapElements(listHouses) {
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
@@ -17,52 +32,66 @@
     window.pin.renderMapPins(listHouses);
     window.data.mapOpen.disabled = 'disabled';
     window.renderCard(listHouses);
+    window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+
+    function renderFilteredPins() {
+      clearMap();
+      var filtered = window.filters.applyFilters(listHouses);
+      window.pin.renderMapPins(filtered);
+      var newPins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
+      window.renderCard(filtered);
+      var newCards = window.data.map.querySelectorAll('.map__card');
+      addEventClick(newPins, newCards, filtered);
+    }
+
+    window.filters.onFilterChange(renderFilteredPins);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
-
     window.cards = window.data.map.querySelectorAll('.map__card');
-    window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
 
-    function closePopup(index) {
-      window.cards[index].classList.add('hidden');
-      window.buttonsPopup[index].classList.remove('map__pin--active');
+    function closePopup(cards, buttons, index) {
+      cards[index].classList.add('hidden');
+      buttons[index].classList.remove('map__pin--active');
       window.previousCard = -1;
     }
 
-    for (var i = 0; i < listHouses.length; i++) {
-      (function (j) {
-        var buttonClosePopup = window.cards[j].querySelector('.popup__close');
+    function addEventClick(buttons, cards, array) {
+      for (var i = 0; i < Math.min(array.length, window.data.maximumPins); i++) {
+        (function (j) {
+          var buttonClosePopup = cards[j].querySelector('.popup__close');
+          buttons[j].addEventListener('click', function () {
+            window.showCard(buttons, cards, j, closePopup);
+          });
 
-        window.buttonsPopup[j].addEventListener('click', function () {
-          window.showCard(j, closePopup);
-        });
+          buttons[j].addEventListener('keydown', function (evt) {
+            if (evt.keyCode === window.data.enterKeycode) {
+              window.showCard(buttons, cards, j, closePopup);
+            }
+          });
 
-        window.buttonsPopup[j].addEventListener('keydown', function (evt) {
-          if (evt.keyCode === window.data.enterKeycode) {
-            window.showCard(j, closePopup);
+          buttonClosePopup.addEventListener('click', function () {
+            closePopup(cards, buttons, j);
+          });
+
+          buttonClosePopup.addEventListener('keydown', function (evt) {
+            if (evt.keyCode === window.data.enterKeycode) {
+              closePopup(cards, buttons, j);
+            }
+          });
+
+          function onPopupEscPress(evt) {
+            if (evt.keyCode === window.data.escKeycode) {
+              closePopup(j);
+            }
           }
-        });
 
-        buttonClosePopup.addEventListener('click', function () {
-          closePopup(j);
-        });
-
-        buttonClosePopup.addEventListener('keydown', function (evt) {
-          if (evt.keyCode === window.data.enterKeycode) {
-            closePopup(j);
-          }
-        });
-
-        function onPopupEscPress(evt) {
-          if (evt.keyCode === window.data.escKeycode) {
-            closePopup(j);
-          }
-        }
-
-        document.addEventListener('keydown', onPopupEscPress);
-      })(i);
+          document.addEventListener('keydown', onPopupEscPress);
+        })(i);
+      }
     }
+
+    addEventClick(window.buttonsPopup, window.cards, listHouses);
   }
 
   function openElements() {

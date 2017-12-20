@@ -1,5 +1,6 @@
 'use strict';
 window.data = (function () {
+  var MAXIMIM_PINS = 5;
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var HOUSES_MAP = document.querySelector('.map__pins');
@@ -8,6 +9,7 @@ window.data = (function () {
   var NOTICE_TEMPLATE = document.querySelector('template').content.querySelector('article.map__card');
 
   return {
+    maximumPins: MAXIMIM_PINS,
     escKeycode: ESC_KEYCODE,
     enterKeycode: ENTER_KEYCODE,
     housesMap: HOUSES_MAP,
