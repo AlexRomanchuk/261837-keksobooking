@@ -1,5 +1,4 @@
 ﻿'use strict';
-
 window.pin = (function () {
   var PIN_CENTER = 20; // середина кнопки .map__pin
   var PIN_HEIGTH = 44;

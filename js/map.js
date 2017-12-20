@@ -1,5 +1,4 @@
 ﻿'use strict';
-
 (function () {
   var MAXIMUM_PINS = 5;
 
@@ -18,7 +17,7 @@
     }
   };
 
-  window.updatePins = function (origin, filtered, buttons) {
+  var updatePins = function (origin, filtered, buttons) {
     for (var t = 0; t < buttons.length; t++) {
       buttons[t].classList.add('hidden');
     }
@@ -38,7 +37,13 @@
     window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
     showPins(window.buttonsPopup);
 
-    window.filters.onFilterChange(listHouses);
+
+    var showFilteredPins = function () {
+      var filtered = window.filters.applyFilters(listHouses);
+      updatePins(listHouses, filtered, window.buttonsPopup);
+    };
+
+    window.filters.onFilterChange(showFilteredPins);
 
     // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
     window.previousCard = -1;
