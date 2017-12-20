@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 window.synchronizeFields = function (inputIn, inputOut, arrayValuesIn, arrayValuesOut, callback) {
   inputIn.addEventListener('input', function () {

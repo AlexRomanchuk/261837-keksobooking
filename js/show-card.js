@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 window.showCard = function (index, callback) {
   var currentCard = index;

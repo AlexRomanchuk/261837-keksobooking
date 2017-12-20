@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 window.data = (function () {
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;

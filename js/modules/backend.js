@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 window.backend = (function () {
   var url = 'https://1510.dump.academy/keksobooking';
