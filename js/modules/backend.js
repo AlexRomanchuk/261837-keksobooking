@@ -4,14 +4,15 @@ window.backend = (function () {
   var url = 'https://1510.dump.academy/keksobooking';
   var errorStyle = 'background: #ffb8c2; border: 1px dashed white; text-align: center; font-size: 25px;';
   var emergencyStyle = 'background: #e5be01; border: 1px dashed black; text-align: center; font-size: 25px;';
+  window.successStyle = 'background: #bcf5bc; border: 1px dashed white; text-align: center; font-size: 20px; width: 100%;';
 
-  window.messageError = function (message, alertStyle) {
-    var nextElem = document.querySelector('h2');
-    var errorField = document.querySelector('.map__pinsoverlay');
-    var errorAlert = document.createElement('div');
-    errorAlert.style = alertStyle;
-    errorAlert.textContent = message;
-    errorField.insertBefore(errorAlert, nextElem);
+  window.messageStatus = function (message, alertStyle, selector, nextSelector) {
+    var nextElem = document.querySelector(nextSelector);
+    var statusField = document.querySelector(selector);
+    var statusAlert = document.createElement('div');
+    statusAlert.style = alertStyle;
+    statusAlert.textContent = message;
+    statusField.insertBefore(statusAlert, nextElem);
   };
 
   function actionXhr(onLoad, onError, method, link, data) {
@@ -25,20 +26,20 @@ window.backend = (function () {
           onLoad(xhr.response);
           break;
         case 404:
-          onError('URL ' + url + ' не найден. Ошибка ' + xhr.status + ' ' + xhr.statusText, errorStyle);
+          onError('URL ' + url + ' не найден. Ошибка ' + xhr.status + ' ' + xhr.statusText, errorStyle, '.map__pinsoverlay', 'h2');
           break;
         default:
-          onError('Неизвестная ошибка: ' + xhr.status + ' ' + xhr.statusText, errorStyle);
+          onError('Неизвестная ошибка: ' + xhr.status + ' ' + xhr.statusText, errorStyle, '.map__pinsoverlay', 'h2');
           break;
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения', emergencyStyle);
+      onError('Произошла ошибка соединения', emergencyStyle, '.map__pinsoverlay', 'h2');
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс', emergencyStyle);
+      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс', emergencyStyle, '.map__pinsoverlay', 'h2');
     });
 
     xhr.open(method, url + link);

@@ -58,10 +58,11 @@
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () {
+      window.messageStatus('Объявление отправлено успешно! Вы можете написать следующее.', window.successStyle, '.notice__form', '.notice__header');
       noticeForm.reset();
     });
     evt.preventDefault();
-  }, window.messageError);
+  }, window.messageStatus);
 
   function createArrayValues(list) {
     var arr = [];

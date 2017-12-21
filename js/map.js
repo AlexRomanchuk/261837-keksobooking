@@ -95,7 +95,7 @@
   }
 
   function openElements() {
-    window.backend.load(createMapElements, window.messageError);
+    window.backend.load(createMapElements, window.messageStatus);
   }
 
 
