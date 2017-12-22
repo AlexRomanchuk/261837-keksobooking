@@ -3,6 +3,7 @@
 (function () {
   var MIN_SIMBOLS = 30;
   var noticeForm = window.data.noticeForm;
+  var successStyle = 'background: #bcf5bc; border: 1px dashed white; text-align: center; font-size: 20px; width: 100%;';
 
   var inputTitle = noticeForm.querySelector('#title');
   var inputAddress = noticeForm.querySelector('#address');
@@ -65,7 +66,7 @@
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () {
-      window.showStatus('Объявление отправлено успешно! Вы можете написать следующее.', window.successStyle, '.notice__form', '.notice__header');
+      window.showStatus('Объявление отправлено успешно! Вы можете написать следующее.', successStyle, '.notice__form', '.notice__header');
       noticeForm.reset();
     });
     evt.preventDefault();
