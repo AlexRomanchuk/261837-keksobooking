@@ -30,6 +30,13 @@
             window.card.showCard(pin, data, i);
           };
         })(mapPin));
+        mapPin.addEventListener('keydown', (function (evt, pin) {
+          return function () {
+            if (evt.keyCode === window.data.enterKeycode) {
+              window.card.showCard(pin, data, i);
+            }
+          };
+        })(mapPin));
         fragment.appendChild(mapPin);
       }
       mapList.appendChild(fragment);
