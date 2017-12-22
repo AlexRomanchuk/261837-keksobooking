@@ -4,8 +4,8 @@ window.filters = (function () {
   var LOW_PRICE_LIMIT = 10000;
   var UPPER_PRICE_LIMIT = 50000;
   var VALUE_ANY = 'any';
-  var FILTER_SELECT_ID = ['housing-type', 'housing-price', 'housing-rooms', 'housing-guests'];
-  var FILTER_FEATURES_ID = ['filter-wifi', 'filter-dishwasher', 'filter-parking', 'filter-washer', 'filter-elevator', 'filter-conditioner'];
+  var TYPES = ['housing-type', 'housing-price', 'housing-rooms', 'housing-guests'];
+  var FEATURES = ['filter-wifi', 'filter-dishwasher', 'filter-parking', 'filter-washer', 'filter-elevator', 'filter-conditioner'];
   var filterForm = document.querySelector('.map__filters');
   var housingValues = [];
   var featuresValues = [];
@@ -18,13 +18,13 @@ window.filters = (function () {
   }, TIMER);
 
   function getSelectedValues() {
-    FILTER_SELECT_ID.forEach(function (item) {
+    TYPES.forEach(function (item) {
       var selectNode = filterForm.querySelector('#' + item);
       if (selectNode) {
         housingValues.push(selectNode.value);
       }
     });
-    FILTER_FEATURES_ID.forEach(function (item) {
+    FEATURES.forEach(function (item) {
       var featureCheckbox = filterForm.querySelector('#' + item);
       if (featureCheckbox && featureCheckbox.checked) {
         featuresValues.push(featureCheckbox.value);
@@ -36,16 +36,13 @@ window.filters = (function () {
     var priceCheck = false;
     switch (housingValues[1]) {
       case 'low':
-        priceCheck = filterPrice < LOW_PRICE_LIMIT;
-        break;
+        return filterPrice < LOW_PRICE_LIMIT;
       case 'middle':
-        priceCheck = filterPrice >= LOW_PRICE_LIMIT && filterPrice <= UPPER_PRICE_LIMIT;
-        break;
+        return filterPrice >= LOW_PRICE_LIMIT && filterPrice <= UPPER_PRICE_LIMIT;
       case 'high':
-        priceCheck = filterPrice > UPPER_PRICE_LIMIT;
-        break;
+        return filterPrice > UPPER_PRICE_LIMIT;
       default:
-        priceCheck = true;
+        return true;
     }
     return priceCheck;
   }
@@ -55,6 +52,7 @@ window.filters = (function () {
   }
 
   function isCorrectFeature(filterFeatures) {
+    console.log(filterFeatures);
     function isFeatureInHouse(feature) {
       return filterFeatures.indexOf(feature) !== -1;
     }

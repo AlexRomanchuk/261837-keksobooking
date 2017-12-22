@@ -1,6 +1,6 @@
 'use strict';
 
-window.showCard = function (buttons, cards, index, callback) {
+/* window.showCard = function (buttons, cards, index, callback) {
   var currentCard = index;
   buttons[index].classList.add('map__pin--active');
   cards[index].classList.remove('hidden');
@@ -8,4 +8,4 @@ window.showCard = function (buttons, cards, index, callback) {
     callback(cards, buttons, window.previousCard);
   }
   window.previousCard = currentCard;
-};
+}; */

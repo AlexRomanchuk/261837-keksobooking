@@ -1,5 +1,5 @@
 'use strict';
-window.pin = (function () {
+/* window.pin = (function () {
   var PIN_CENTER = 20; // середина кнопки .map__pin
   var PIN_HEIGTH = 44;
   var AVATAR_SIZE = 40; // ширина и высота аватарки равны
@@ -7,6 +7,7 @@ window.pin = (function () {
   function render(arrayAvatars, creatingFunctionName) {
     var mapList = document.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
+    var maximunPins = Math.min(arrayAvatars.length, window.data.maximumPins)
     for (var i = 0; i < Math.min(arrayAvatars.length, window.data.maximumPins); i++) {
       fragment.appendChild(creatingFunctionName(arrayAvatars[i], i));
     }
@@ -31,4 +32,4 @@ window.pin = (function () {
       render(array, createElement);
     }
   };
-})();
+})(); */

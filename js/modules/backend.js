@@ -6,7 +6,7 @@ window.backend = (function () {
   var emergencyStyle = 'background: #e5be01; border: 1px dashed black; text-align: center; font-size: 25px;';
   window.successStyle = 'background: #bcf5bc; border: 1px dashed white; text-align: center; font-size: 20px; width: 100%;';
 
-  window.messageStatus = function (message, alertStyle, selector, nextSelector) {
+  window.showStatus = function (message, alertStyle, selector, nextSelector) {
     var nextElem = document.querySelector(nextSelector);
     var statusField = document.querySelector(selector);
     var statusAlert = document.createElement('div');
@@ -15,7 +15,7 @@ window.backend = (function () {
     statusField.insertBefore(statusAlert, nextElem);
   };
 
-  function actionXhr(onLoad, onError, method, link, data) {
+  function createRequest(onLoad, onError, method, link, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.timeout = 10000;
@@ -49,11 +49,11 @@ window.backend = (function () {
 
   return {
     load: function (onLoad, onError) {
-      actionXhr(onLoad, onError, 'GET', '/data');
+      createRequest(onLoad, onError, 'GET', '/data');
     },
 
     save: function (formdata, onLoad, onError) {
-      actionXhr(onLoad, onError, 'POST', '', formdata);
+      createRequest(onLoad, onError, 'POST', '', formdata);
     }
   };
 

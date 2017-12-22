@@ -1,6 +1,13 @@
 'use strict';
 
 (function () {
+  var MIN_Y = 100; // миимальная ордината, выше которой флажок адреса поднять нельзя
+  var MAX_Y = 500; // максимальая ордината, ниже которой флажок адреса опустить нельзя
+  var ADDRESS_PIN_HEIGTH = 65;
+  var PIN_CENTER = 20; // середина кнопки .map__pin
+  var PIN_HEIGTH = 44;
+  var AVATAR_SIZE = 40; // ширина и высота аватарки равны
+
   // "Закрытие" или "открытие" полей добавлением свойства "disabled" (закрыто) или "" (открыто)
   function toggleFields(disabledProperty) {
     for (var i = 0; i < window.data.fields.length; i++) {
@@ -9,6 +16,58 @@
   }
 
   toggleFields('disabled');
+
+  window.pin = {
+    addPins: function(data) {
+      var mapList = document.querySelector('.map__pins');
+      var fragment = document.createDocumentFragment();
+      var maximunPins = Math.min(data.length, window.data.maximumPins)
+      for (var i = 0; i < maximunPins; i++) {
+        var mapPin = window.pin.createPin(data[i]);
+        mapPin.dataset.offerIndex = i;
+        mapPin.addEventListener('click', (function (pin) {
+          return function () {
+            window.card.showCard(pin, data, i);
+          };
+        })(mapPin));
+        mapPin.addEventListener('keydown', (function (evt, pin) {
+          if (evt.keyCode === window.data.enterKeyCode) {
+            return function () {
+              window.card.showCard(pin, data, i);
+            };
+          }
+        })(mapPin));
+        fragment.appendChild(mapPin);
+      }
+      mapList.appendChild(fragment);
+    },
+
+    createPin: function (avatars) {
+      var newMapPin = document.createElement('button');
+      newMapPin.className = 'map__pin';
+      newMapPin.style.left = (avatars.location.x + PIN_CENTER) + 'px';
+      newMapPin.style.top = (avatars.location.y + PIN_HEIGTH) + 'px';
+      var newAvatar = document.createElement('img');
+      newAvatar.width = AVATAR_SIZE;
+      newAvatar.heigth = AVATAR_SIZE;
+      newAvatar.src = avatars.author.avatar;
+      newAvatar.draggable = false;
+      newMapPin.appendChild(newAvatar);
+      return newMapPin;
+    },
+
+    activatePin: function (pin) {
+      var activePins = document.querySelectorAll('.map__pin--active');
+      for (var i = 0; i < activePins.length; i++) {
+        activePins[i].classList.remove('map__pin--active');
+      }
+      pin.classList.add('map__pin--active');
+    },
+
+    generatePinElement: function (data) {
+      window.pin.addPins(data, window.pin.createPin);
+    }
+  }
 
   function clearMap() {
     var pins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
@@ -29,73 +88,20 @@
     showBlock('.map');
     window.data.noticeForm.classList.remove('notice__form--disabled');
     toggleFields('');
-    window.pin.renderMapPins(listHouses);
+    window.pin.generatePinElement(listHouses);
     window.data.mapOpen.disabled = 'disabled';
-    window.renderCard(listHouses);
-    window.buttonsPopup = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
 
     function renderFilteredPins() {
       clearMap();
       var filtered = window.filters.applyFilters(listHouses);
-      window.pin.renderMapPins(filtered);
-      var newPins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
-      window.renderCard(filtered);
-      var newCards = window.data.map.querySelectorAll('.map__card');
-      addEventClick(newPins, newCards, filtered);
+      window.pin.generatePinElement(filtered);
     }
 
     window.filters.onFilterChange(renderFilteredPins);
-
-    // Предыдущая карточка. Значение равно -1, если не существует (была закрыта ранее или не открывалась)
-    window.previousCard = -1;
-    window.cards = window.data.map.querySelectorAll('.map__card');
-
-    function closePopup(cards, buttons, index) {
-      cards[index].classList.add('hidden');
-      buttons[index].classList.remove('map__pin--active');
-      window.previousCard = -1;
-    }
-
-    function addEventClick(buttons, cards, array) {
-      for (var i = 0; i < Math.min(array.length, window.data.maximumPins); i++) {
-        (function (j) {
-          var buttonClosePopup = cards[j].querySelector('.popup__close');
-          buttons[j].addEventListener('click', function () {
-            window.showCard(buttons, cards, j, closePopup);
-          });
-
-          buttons[j].addEventListener('keydown', function (evt) {
-            if (evt.keyCode === window.data.enterKeycode) {
-              window.showCard(buttons, cards, j, closePopup);
-            }
-          });
-
-          buttonClosePopup.addEventListener('click', function () {
-            closePopup(cards, buttons, j);
-          });
-
-          buttonClosePopup.addEventListener('keydown', function (evt) {
-            if (evt.keyCode === window.data.enterKeycode) {
-              closePopup(cards, buttons, j);
-            }
-          });
-
-          function onPopupEscPress(evt) {
-            if (evt.keyCode === window.data.escKeycode) {
-              closePopup(j);
-            }
-          }
-
-          document.addEventListener('keydown', onPopupEscPress);
-        })(i);
-      }
-    }
-
-    addEventClick(window.buttonsPopup, window.cards, listHouses);
   }
 
   function openElements() {
-    window.backend.load(createMapElements, window.messageStatus);
+    window.backend.load(createMapElements, window.showStatus);
   }
 
 
@@ -117,9 +123,8 @@
   var startCoords = 0;
   var addressPin = window.data.mapOpen.querySelector('img');
 
-  addressPin.addEventListener('mousedown', function (evt) {
+  function onMouseDown(evt) {
     evt.preventDefault();
-
     startCoords = {
       x: evt.clientX,
       y: evt.clientY
@@ -127,11 +132,10 @@
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-  });
+  }
 
-  var MIN_Y = 100; // миимальная ордината, выше которой флажок адреса поднять нельзя
-  var MAX_Y = 500; // максимальая ордината, ниже которой флажок адреса опустить нельзя
-  var ADDRESS_PIN_HEIGTH = 65;
+  addressPin.addEventListener('mousedown', onMouseDown);
+
   var minCurrentY = MIN_Y - ADDRESS_PIN_HEIGTH;
   var maxCurrentY = MAX_Y - ADDRESS_PIN_HEIGTH; // учет высоты флажка
 

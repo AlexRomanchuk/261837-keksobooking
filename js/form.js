@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var MIN_SIMBOLS = 30;
   var noticeForm = window.data.noticeForm;
 
   var inputTitle = noticeForm.querySelector('#title');
@@ -17,7 +18,7 @@
     input.style = 'background: #ffb8c2';
   }
 
-  function validityForm() {
+  function onFormSubmit() {
     markInvalidField(inputTitle);
     markInvalidField(inputAddress);
     markInvalidField(inputPrice);
@@ -32,6 +33,14 @@
       inputTitle.setCustomValidity('');
       inputTitle.style = '';
     }
+
+    inputTitle.addEventListener('input', function (evt) {
+      var target = evt.target;
+      var minSimbols = target.value.length;
+      var errMessage = '';
+      errMessage = minSimbols < MIN_SIMBOLS ? 'Заголовок должен содержать минимум 30 символов.' : '';
+      target.setCustomValidity(errMessage);
+    });
 
     if (inputAddress.validity.valueMissing) {
       inputAddress.setCustomValidity('Адрес должен быть указан.');
@@ -52,29 +61,27 @@
     }
   }
 
-  submitButton.addEventListener('click', function () {
-    validityForm();
-  });
+  submitButton.addEventListener('click', onFormSubmit);
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () {
-      window.messageStatus('Объявление отправлено успешно! Вы можете написать следующее.', window.successStyle, '.notice__form', '.notice__header');
+      window.showStatus('Объявление отправлено успешно! Вы можете написать следующее.', window.successStyle, '.notice__form', '.notice__header');
       noticeForm.reset();
     });
     evt.preventDefault();
-  }, window.messageStatus);
+  }, window.showStatus);
 
   function createArrayValues(list) {
-    var arr = [];
+    var values = [];
     for (var i = 0; i < list.length; i++) {
-      arr.push(list[i].value);
+      values.push(list[i].value);
     }
-    return arr;
+    return values;
   }
 
   function syncValues(value, elem) {
     elem.value = value;
-    elem.addEventListener('input', function () {
+    elem.addEventListener('change', function () {
       inputTimein.value = elem.value;
     });
   }
@@ -87,18 +94,24 @@
     elem.value = (inputRooms.value !== '100') ? inputRooms.value : '0';
   }
 
-  var timeinList = createArrayValues(inputTimein.querySelectorAll('option'));
-  var timeoutList = createArrayValues(inputTimeout.querySelectorAll('option'));
+  var timeinValues = createArrayValues(inputTimein.querySelectorAll('option'));
+  var timeoutValues = createArrayValues(inputTimeout.querySelectorAll('option'));
 
-  window.synchronizeFields(inputTimein, inputTimeout, timeinList, timeoutList, syncValues);
+  inputTimein.addEventListener('change', function () {
+    window.synchronizeFields(inputTimein, inputTimeout, timeinValues, timeoutValues, syncValues);
+  });
 
-  var typeList = createArrayValues(inputType.querySelectorAll('option'));
-  var minList = [1000, 0, 5000, 10000];
+  var typeValues = createArrayValues(inputType.querySelectorAll('option'));
+  var minValues = [1000, 0, 5000, 10000];
 
-  window.synchronizeFields(inputType, inputPrice, typeList, minList, syncValuesWithMin);
+  inputType.addEventListener('change', function () {
+    window.synchronizeFields(inputType, inputPrice, typeValues, minValues, syncValuesWithMin);
+  });
 
-  var roomsList = createArrayValues(inputRooms.querySelectorAll('option'));
-  var capacityList = createArrayValues(inputCapacity.querySelectorAll('option'));
+  var roomsValues = createArrayValues(inputRooms.querySelectorAll('option'));
+  var capacityValues = createArrayValues(inputCapacity.querySelectorAll('option'));
 
-  window.synchronizeFields(inputRooms, inputCapacity, roomsList, capacityList, syncCapacity);
+  inputRooms.addEventListener('change', function () {
+    window.synchronizeFields(inputRooms, inputCapacity, roomsValues, capacityValues, syncCapacity);
+  });
 })();
