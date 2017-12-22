@@ -1,5 +1,5 @@
 'use strict';
-window.filters = (function () {
+(function () {
   var TIMER = 500;
   var LOW_PRICE_LIMIT = 10000;
   var UPPER_PRICE_LIMIT = 50000;
@@ -33,7 +33,6 @@ window.filters = (function () {
   }
 
   function isCorrectPrice(filterPrice) {
-    var priceCheck = false;
     switch (housingValues[1]) {
       case 'low':
         return filterPrice < LOW_PRICE_LIMIT;
@@ -44,7 +43,6 @@ window.filters = (function () {
       default:
         return true;
     }
-    return priceCheck;
   }
 
   function isCorrectField(filterField, selectIdIndex) {
@@ -52,7 +50,6 @@ window.filters = (function () {
   }
 
   function isCorrectFeature(filterFeatures) {
-    console.log(filterFeatures);
     function isFeatureInHouse(feature) {
       return filterFeatures.indexOf(feature) !== -1;
     }
@@ -67,7 +64,7 @@ window.filters = (function () {
       isCorrectFeature(housingData.offer.features);
   }
 
-  return {
+  window.filters = {
     applyFilters: function (data) {
       housingValues = [];
       featuresValues = [];

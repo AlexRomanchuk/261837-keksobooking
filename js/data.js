@@ -1,5 +1,5 @@
 'use strict';
-window.data = (function () {
+(function () {
   var MAXIMIM_PINS = 5;
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
@@ -8,7 +8,7 @@ window.data = (function () {
   var map = document.querySelector('.map');
   var noticeTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-  return {
+  window.data = {
     maximumPins: MAXIMIM_PINS,
     escKeycode: ESC_KEYCODE,
     enterKeycode: ENTER_KEYCODE,

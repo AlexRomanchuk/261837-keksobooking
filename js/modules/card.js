@@ -39,7 +39,7 @@
   }
 
   window.card = {
-    createNotice: function (offerData) {
+    createNotice: function (offerData, pin) {
       var contentItems = ['Координаты: ' + offerData.offer.address, offerData.offer.price + ' \u20bd/ночь',
         offerData.offer.rooms + ' комнат для ' + offerData.offer.guests + ' гостей',
         'Заезд после ' + offerData.offer.checkin + ', выезд до ' + offerData.offer.checkout,
@@ -51,24 +51,37 @@
       newNotice.querySelector('small').textContent = contentItems[0];
       getElementP(newNotice, contentItems);
       getListFeatures(newNotice, offerData.offer.features, 'ul.popup__features');
-      newNotice.querySelector('.popup__close').addEventListener('click', function () {
-        window.card.closePopup();
+      var buttonPopup = newNotice.querySelector('.popup__close');
+      buttonPopup.addEventListener('click', function () {
+        window.card.closePopup(pin);
+      });
+      buttonPopup.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === window.data.enterKeycode) {
+          window.card.closePopup(pin);
+        }
+      });
+      document.addEventListener('keydown', function onPopupEscPress(evt) {
+        if (evt.keyCode === window.data.escKeycode) {
+          window.card.closePopup(pin);
+          document.removeEventListener('keydown', onPopupEscPress);
+        }
       });
       return newNotice;
     },
 
-    closePopup: function () {
+    closePopup: function (pin) {
       var article = window.data.map.querySelector('.map__card');
-      if (article !== null) {
+      if (article) {
         window.data.map.removeChild(article);
+        pin.classList.remove('map__pin--active');
       }
     },
 
-    showCard: function (pin, data, index) {
-      window.card.closePopup();
+    showCard: function (pin, data) {
       if (pin) {
+        window.card.closePopup(pin);
         var offer = data[pin.dataset.offerIndex];
-        var newCard = window.card.createNotice(offer);
+        var newCard = window.card.createNotice(offer, pin);
         window.pin.activatePin(pin);
         window.data.map.insertBefore(newCard, nextElement);
       }

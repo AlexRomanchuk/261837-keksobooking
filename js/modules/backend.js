@@ -1,6 +1,6 @@
 'use strict';
 
-window.backend = (function () {
+(function () {
   var url = 'https://1510.dump.academy/keksobooking';
   var errorStyle = 'background: #ffb8c2; border: 1px dashed white; text-align: center; font-size: 25px;';
   var emergencyStyle = 'background: #e5be01; border: 1px dashed black; text-align: center; font-size: 25px;';
@@ -47,7 +47,7 @@ window.backend = (function () {
     xhr.send(data);
   }
 
-  return {
+  window.backend = {
     load: function (onLoad, onError) {
       createRequest(onLoad, onError, 'GET', '/data');
     },

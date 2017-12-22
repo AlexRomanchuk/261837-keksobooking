@@ -18,10 +18,10 @@
   toggleFields('disabled');
 
   window.pin = {
-    addPins: function(data) {
+    addPins: function (data) {
       var mapList = document.querySelector('.map__pins');
       var fragment = document.createDocumentFragment();
-      var maximunPins = Math.min(data.length, window.data.maximumPins)
+      var maximunPins = Math.min(data.length, window.data.maximumPins);
       for (var i = 0; i < maximunPins; i++) {
         var mapPin = window.pin.createPin(data[i]);
         mapPin.dataset.offerIndex = i;
@@ -29,13 +29,6 @@
           return function () {
             window.card.showCard(pin, data, i);
           };
-        })(mapPin));
-        mapPin.addEventListener('keydown', (function (evt, pin) {
-          if (evt.keyCode === window.data.enterKeyCode) {
-            return function () {
-              window.card.showCard(pin, data, i);
-            };
-          }
         })(mapPin));
         fragment.appendChild(mapPin);
       }
@@ -67,7 +60,7 @@
     generatePinElement: function (data) {
       window.pin.addPins(data, window.pin.createPin);
     }
-  }
+  };
 
   function clearMap() {
     var pins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
