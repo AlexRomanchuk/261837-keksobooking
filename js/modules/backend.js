@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var OK_STATUS = 200;
+  var NOT_FOUND_STATUS = 404;
   var url = 'https://1510.dump.academy/keksobooking';
   var errorStyle = 'background: #ffb8c2; border: 1px dashed white; text-align: center; font-size: 25px;';
   var emergencyStyle = 'background: #e5be01; border: 1px dashed black; text-align: center; font-size: 25px;';
@@ -21,10 +23,10 @@
 
     xhr.addEventListener('load', function () {
       switch (xhr.status) {
-        case 200:
+        case OK_STATUS:
           onLoad(xhr.response);
           break;
-        case 404:
+        case NOT_FOUND_STATUS:
           onError('URL ' + url + ' не найден. Ошибка ' + xhr.status + ' ' + xhr.statusText, errorStyle, '.map__pinsoverlay', 'h2');
           break;
         default:

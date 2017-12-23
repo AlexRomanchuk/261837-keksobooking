@@ -1,5 +1,8 @@
 'use strict';
 (function () {
+  var SELECT_TYPE_ID = 0;
+  var SELECT_ROOMS_ID = 2;
+  var SELECT_GUESTS_ID = 3;
   var TIMER = 500;
   var LOW_PRICE_LIMIT = 10000;
   var UPPER_PRICE_LIMIT = 50000;
@@ -57,9 +60,9 @@
 
   function isCorrect(housingData) {
     return isCorrectPrice(housingData.offer.price) &&
-      isCorrectField(housingData.offer.type, 0) &&
-      isCorrectField(housingData.offer.rooms.toString(), 2) &&
-      isCorrectField(housingData.offer.guests.toString(), 3) &&
+      isCorrectField(housingData.offer.type, SELECT_TYPE_ID) &&
+      isCorrectField(housingData.offer.rooms.toString(), SELECT_ROOMS_ID) &&
+      isCorrectField(housingData.offer.guests.toString(), SELECT_GUESTS_ID) &&
       isCorrectFeature(housingData.offer.features);
   }
 

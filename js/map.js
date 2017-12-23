@@ -94,8 +94,8 @@
 
     function renderFilteredPins() {
       clearMap();
-      var filteredNotice = window.filters.applyFilters(listHouses);
-      window.pin.generatePinElement(filteredNotice);
+      var filteredNotices = window.filters.applyFilters(listHouses);
+      window.pin.generatePinElement(filteredNotices);
     }
 
     window.filters.onFilterChange(renderFilteredPins);

@@ -1,6 +1,10 @@
 'use strict';
 
 (function () {
+  var MIN_PRICE_BUNGALO = 0;
+  var MIN_PRICE_FLAT = 1000;
+  var MIN_PRICE_HOUSE = 5000;
+  var MIN_PRICE_PALACE = 10000;
   var MIN_GUESTS_VALUE = '0';
   var MAX_ROOMS_VALUE = '100';
   var MIN_SIMBOLS = 30;
@@ -27,9 +31,9 @@
     markInvalidField(inputPrice);
 
     if (inputTitle.validity.tooShort) {
-      inputTitle.setCustomValidity('Заголовок должен содержать минимум 30 символов.');
+      inputTitle.setCustomValidity('Заголовок должен содержать минимум ' + inputTitle.minLength + ' символов.');
     } else if (inputTitle.validity.tooLong) {
-      inputTitle.setCustomValidity('Заголовок не должен превышать 100-ти символов.');
+      inputTitle.setCustomValidity('Заголовок не должен превышать ' + inputTitle.maxLength + ' символов.');
     } else if (inputTitle.validity.valueMissing) {
       inputTitle.setCustomValidity('Заголовок должен быть указан.');
     } else {
@@ -41,7 +45,7 @@
       var target = evt.target;
       var minSimbols = target.value.length;
       var errMessage = '';
-      errMessage = minSimbols < MIN_SIMBOLS ? 'Заголовок должен содержать минимум 30 символов.' : '';
+      errMessage = minSimbols < MIN_SIMBOLS ? 'Заголовок должен содержать минимум ' + MIN_SIMBOLS + ' символов.' : '';
       target.setCustomValidity(errMessage);
     });
 
@@ -74,27 +78,27 @@
     evt.preventDefault();
   }, window.showStatus);
 
-  function createArrayValues(list) {
+  function createArrayValues(selectItems) {
     var values = [];
-    for (var i = 0; i < list.length; i++) {
-      values.push(list[i].value);
-    }
+    selectItems.forEach(function (selectOption) {
+      values.push(selectOption.value);
+    });
     return values;
   }
 
-  function syncValues(value, elem) {
-    elem.value = value;
-    elem.addEventListener('change', function () {
-      inputTimein.value = elem.value;
+  function syncValues(value, selectField) {
+    selectField.value = value;
+    selectField.addEventListener('change', function () {
+      inputTimein.value = selectField.value;
     });
   }
 
-  function syncValuesWithMin(value, elem) {
-    elem.min = value;
+  function syncValuesWithMin(minValue, fieldWithMin) {
+    fieldWithMin.min = minValue;
   }
 
-  function syncCapacity(value, elem) {
-    elem.value = (inputRooms.value !== MAX_ROOMS_VALUE) ? inputRooms.value : MIN_GUESTS_VALUE;
+  function syncCapacity(value, selectField) {
+    selectField.value = (inputRooms.value !== MAX_ROOMS_VALUE) ? inputRooms.value : MIN_GUESTS_VALUE;
   }
 
   var timeinValues = createArrayValues(inputTimein.querySelectorAll('option'));
@@ -105,7 +109,7 @@
   });
 
   var typeValues = createArrayValues(inputType.querySelectorAll('option'));
-  var minValues = [1000, 0, 5000, 10000];
+  var minValues = [MIN_PRICE_FLAT, MIN_PRICE_BUNGALO, MIN_PRICE_HOUSE, MIN_PRICE_PALACE];
 
   inputType.addEventListener('change', function () {
     window.synchronizeFields(inputType, inputPrice, typeValues, minValues, syncValuesWithMin);
