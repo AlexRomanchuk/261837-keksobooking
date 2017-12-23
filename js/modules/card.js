@@ -45,10 +45,10 @@
         'Заезд после ' + offerData.offer.checkin + ', выезд до ' + offerData.offer.checkout,
         offerData.offer.description];
       var newNotice = window.data.template.cloneNode(true);
+      newNotice.querySelector('small').textContent = contentItems[0];
       newNotice.querySelector('.popup__avatar').src = offerData.author.avatar;
       newNotice.querySelector('h3').textContent = offerData.offer.title;
       newNotice.querySelector('h4').textContent = getHomeType(offerData.offer.type);
-      newNotice.querySelector('small').textContent = contentItems[0];
       getElementP(newNotice, contentItems);
       getListFeatures(newNotice, offerData.offer.features, 'ul.popup__features');
       var buttonPopup = newNotice.querySelector('.popup__close');

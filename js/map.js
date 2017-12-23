@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MIN_X = 0;
+  var MAX_X = 1200;
   var MIN_Y = 100; // миимальная ордината, выше которой флажок адреса поднять нельзя
   var MAX_Y = 500; // максимальая ордината, ниже которой флажок адреса опустить нельзя
   var ADDRESS_PIN_HEIGTH = 65;
@@ -27,13 +29,13 @@
         mapPin.dataset.offerIndex = i;
         mapPin.addEventListener('click', (function (pin) {
           return function () {
-            window.card.showCard(pin, data, i);
+            window.card.showCard(pin, data);
           };
         })(mapPin));
         mapPin.addEventListener('keydown', (function (evt, pin) {
           return function () {
             if (evt.keyCode === window.data.enterKeycode) {
-              window.card.showCard(pin, data, i);
+              window.card.showCard(pin, data);
             }
           };
         })(mapPin));
@@ -56,12 +58,12 @@
       return newMapPin;
     },
 
-    activatePin: function (pin) {
+    activatePin: function (noticePin) {
       var activePins = document.querySelectorAll('.map__pin--active');
-      for (var i = 0; i < activePins.length; i++) {
-        activePins[i].classList.remove('map__pin--active');
-      }
-      pin.classList.add('map__pin--active');
+      activePins.forEach(function (pin) {
+        pin.classList.remove('map__pin--active');
+      });
+      noticePin.classList.add('map__pin--active');
     },
 
     generatePinElement: function (data) {
@@ -71,16 +73,16 @@
 
   function clearMap() {
     var pins = window.data.housesMap.querySelectorAll('.map__pin:nth-child(n+3)');
-    for (var i = 0; i < pins.length; i++) {
-      if (pins) {
-        window.data.housesMap.removeChild(pins[i]);
-      }
+    if (pins) {
+      pins.forEach(function (pin) {
+        window.data.housesMap.removeChild(pin);
+      });
     }
     var cards = window.data.map.querySelectorAll('.map__card');
-    for (var j = 0; j < cards.length; j++) {
-      if (cards) {
-        window.data.map.removeChild(cards[j]);
-      }
+    if (cards) {
+      cards.forEach(function (card) {
+        window.data.map.removeChild(card);
+      });
     }
   }
 
@@ -89,31 +91,15 @@
     window.data.noticeForm.classList.remove('notice__form--disabled');
     toggleFields('');
     window.pin.generatePinElement(listHouses);
-    window.data.mapOpen.disabled = 'disabled';
 
     function renderFilteredPins() {
       clearMap();
-      var filtered = window.filters.applyFilters(listHouses);
-      window.pin.generatePinElement(filtered);
+      var filteredNotices = window.filters.applyFilters(listHouses);
+      window.pin.generatePinElement(filteredNotices);
     }
 
     window.filters.onFilterChange(renderFilteredPins);
   }
-
-  function openElements() {
-    window.backend.load(createMapElements, window.showStatus);
-  }
-
-
-  window.data.mapOpen.addEventListener('mouseup', function () {
-    openElements();
-  });
-
-  window.data.mapOpen.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === window.data.enterKeycode) {
-      openElements();
-    }
-  });
 
   // Функция показа элементов
   function showBlock() {
@@ -121,25 +107,18 @@
   }
 
   var startCoords = 0;
-  var addressPin = window.data.mapOpen.querySelector('img');
 
-  function onMouseDown(evt) {
-    evt.preventDefault();
-    startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+  function onMouseUp(upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('moveEvt', onMouseMove);
+    document.removeEventListener('mousedown', onMouseDown);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
   }
 
-  addressPin.addEventListener('mousedown', onMouseDown);
-
-  var minCurrentY = MIN_Y - ADDRESS_PIN_HEIGTH;
-  var maxCurrentY = MAX_Y - ADDRESS_PIN_HEIGTH; // учет высоты флажка
-
   function onMouseMove(moveEvt) {
+    var minCurrentY = MIN_Y - ADDRESS_PIN_HEIGTH;
+    var maxCurrentY = MAX_Y - ADDRESS_PIN_HEIGTH; // учет высоты флажка
     moveEvt.preventDefault();
 
     var drag = {
@@ -155,7 +134,8 @@
     var currentX = (window.data.mapOpen.offsetLeft - drag.x);
     var currentY = (window.data.mapOpen.offsetTop - drag.y);
 
-    // Ограничение движения флажка адреса по вертикали. флажок упирается в "невидимые барьеры"
+    // Ограничение движения флажка. флажок упирается в "невидимые барьеры"
+    currentX = Math.min(Math.max(currentX, MIN_X), MAX_X);
     currentY = Math.min(Math.max(currentY, minCurrentY), maxCurrentY);
 
     window.data.mapOpen.style.top = currentY + 'px';
@@ -163,9 +143,29 @@
     window.data.noticeForm.querySelector('#address').value = 'x: ' + currentX + ', y: ' + (currentY + ADDRESS_PIN_HEIGTH);
   }
 
-  function onMouseUp(upEvt) {
-    upEvt.preventDefault();
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
+  function onMouseDown(evt) {
+    evt.preventDefault();
+    startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    document.addEventListener('moveEvt', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
+
+  function openElements() {
+    window.backend.load(createMapElements, window.showStatus);
+    window.data.mapOpen.addEventListener('mousedown', onMouseDown);
+    window.data.mapOpen.removeEventListener('mouseup', openElements);
+  }
+
+  window.data.mapOpen.addEventListener('mouseup', openElements);
+
+  window.data.mapOpen.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === window.data.enterKeycode) {
+      openElements();
+    }
+  });
 })();
