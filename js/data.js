@@ -15,7 +15,7 @@
     housesMap: housesMap,
     mapOpen: housesMap.querySelector('.map__pin--main'),
     noticeForm: noticeForm,
-    fields: noticeForm.getElementsByTagName('fieldset'),
+    fields: noticeForm.querySelectorAll('fieldset'),
     map: map,
     template: noticeTemplate,
   };

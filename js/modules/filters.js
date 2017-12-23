@@ -6,9 +6,9 @@
   var VALUE_ANY = 'any';
   var TYPES = ['housing-type', 'housing-price', 'housing-rooms', 'housing-guests'];
   var FEATURES = ['filter-wifi', 'filter-dishwasher', 'filter-parking', 'filter-washer', 'filter-elevator', 'filter-conditioner'];
-  var filterForm = document.querySelector('.map__filters');
   var housingValues = [];
   var featuresValues = [];
+  var filterForm = document.querySelector('.map__filters');
 
   var externalCallback = 0;
   var doWithDebounce = window.debounce(function () {
