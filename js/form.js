@@ -1,8 +1,11 @@
 'use strict';
 
 (function () {
+  var MIN_GUESTS_VALUE = '0';
+  var MAX_ROOMS_VALUE = '100';
   var MIN_SIMBOLS = 30;
   var noticeForm = window.data.noticeForm;
+  var successStyle = 'background: #bcf5bc; border: 1px dashed white; text-align: center; font-size: 20px; width: 100%;';
 
   var inputTitle = noticeForm.querySelector('#title');
   var inputAddress = noticeForm.querySelector('#address');
@@ -65,7 +68,7 @@
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () {
-      window.showStatus('Объявление отправлено успешно! Вы можете написать следующее.', window.successStyle, '.notice__form', '.notice__header');
+      window.showStatus('Объявление отправлено успешно! Вы можете написать следующее.', successStyle, '.notice__form', '.notice__header');
       noticeForm.reset();
     });
     evt.preventDefault();
@@ -91,7 +94,7 @@
   }
 
   function syncCapacity(value, elem) {
-    elem.value = (inputRooms.value !== '100') ? inputRooms.value : '0';
+    elem.value = (inputRooms.value !== MAX_ROOMS_VALUE) ? inputRooms.value : MIN_GUESTS_VALUE;
   }
 
   var timeinValues = createArrayValues(inputTimein.querySelectorAll('option'));

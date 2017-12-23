@@ -50,10 +50,9 @@
   }
 
   function isCorrectFeature(filterFeatures) {
-    function isFeatureInHouse(feature) {
+    return featuresValues.every(function (feature) {
       return filterFeatures.indexOf(feature) !== -1;
-    }
-    return featuresValues.every(isFeatureInHouse);
+    });
   }
 
   function isCorrect(housingData) {
